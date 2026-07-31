@@ -1,0 +1,42 @@
+[
+  {
+    "store": "Telstra Store Raymond Terrace (FRE 1.5)",
+    "case": "454132",
+    "po": "PO90548",
+    "issuedTo": "Galvo's IT Solutions",
+    "requestedBy": "Andreane Kharl Gurrea",
+    "issueDate": "2026-07-24",
+    "contactName": "",
+    "contactPhone": "1300203810",
+    "contactEmail": "installations@engagis.com",
+    "siteAddress": "35-39 William Street, Shop 35 MarketPlace Raymond Terrace, NSW 2324",
+    "issue": "TSAURAYTREIPR01 TSN FRE Offline PC — Back to Back solution",
+    "device": "TSAURAYTREIPR01",
+    "ltId": "",
+    "token": "N/A",
+    "jobDate": "2026-07-28",
+    "timeAllocated": "",
+    "jobTime": "During trading hours",
+    "brief": "SOLUTION TYPE: Back to Back\n\nNOTE: Tech to bring step ladder and screwdriver for enclosure.\n\nTECH MUST BRING (IMPORTANT)\n- Wired Keyboard, Mouse and Laptop\n- Ethernet cables and HDMI cables\n- Power tester\n- Universal TV remote control\n- Labeler or masking tape and marker\n\nIMPERATIVE: The TECHNICIAN MUST call Support at 1300-203-810 (Option 1) upon arrival to provide the CHECK-IN TIME and again before leaving to provide the CHECK-OUT TIME, which requires confirmation from the Manager or Onsite Staff for documentation.\n\nNO REBOOT FOR ROUTER AND SWITCH, unless specifically instructed by Telstra Networks and Infrastructure Lead.\nEngagis Support are ONLY ALLOWED to reboot the Engagis PCs ONLY.\nNO equipment is to be connected to ANY device in the LAN rack — either as part of project works or troubleshooting — without approval.\nAlways request a photo of the comms rack from the store and from all tech visits.\n\nJOB REQUIRED:\n- Tech to check power status of both back-to-back shopfront screens.\n- Tech to verify both screens are set to the correct input/source.\n- Tech to check and reseat HDMI, LAN, and power cable connections.\n- Tech to reboot the media player if required.\n- Tech to confirm display output on both screens.\n- Tech to isolate if the issue is with the screen, media player, cabling, or network.\n- Tech to verify content is displaying correctly on both screens.\n- Tech to take photos and call Support before leaving site.\n\nREQUIRED (to be filled in on the SOW):\n- SCREEN HEALTH CHECK on all solutions. If dents, cracks or LED discolouration are noticed, take a clear photo.\n- LED Brightness: ensure brightness levels are consistent and adjustable without flickering or dim spots.\n- Signed SOW + photos MUST be sent to installations@engagis.com within 24 hours of job completion.\n\nINVOICING: cross-reference PO90548. No change to total -> accounts.payable@engagis.com. Change to total -> installations@engagis.com."
+  },
+  {
+    "store": "Telstra Store Muswellbrook (FRE 1.5)",
+    "case": "453824",
+    "po": "PO90543",
+    "issuedTo": "Galvo's IT Solutions",
+    "requestedBy": "Andreane Kharl Gurrea",
+    "issueDate": "2026-07-24",
+    "contactName": "",
+    "contactPhone": "1300203810",
+    "contactEmail": "installations@engagis.com",
+    "siteAddress": "Shop 14 Marketplace, 72-78 Brook Street, Muswellbrook NSW 2333, Australia",
+    "issue": "TSAUMWELBEIVW01 TSN FRE Offline PC — Gallery Solution",
+    "device": "TSAUMWELBEIVW01",
+    "ltId": "",
+    "token": "N/A",
+    "jobDate": "2026-07-27",
+    "timeAllocated": "",
+    "jobTime": "During trading hours",
+    "brief": "SOLUTION TYPE: Gallery Solution\n\nTECH MUST BRING (IMPORTANT)\n- Wired Keyboard, Mouse and Laptop\n- Ethernet cables and HDMI cables\n- Power tester\n- Universal TV remote control\n- Labeler or masking tape and marker\n\nIMPERATIVE: The TECHNICIAN MUST call Support at 1300-203-810 (Option 1) upon arrival to provide the CHECK-IN TIME and again before leaving to provide the CHECK-OUT TIME, which requires confirmation from the Manager or Onsite Staff for documentation.\n\nNO REBOOT FOR ROUTER AND SWITCH, unless specifically instructed by Telstra Networks and Infrastructure Lead.\nEngagis Support are ONLY ALLOWED to reboot the Engagis PCs ONLY.\nNO equipment is to be connected to ANY device in the LAN rack without approval.\nAlways request a photo of the comms rack from the store and from all tech visits.\n\nJOB REQUIRED:\n* Technician to isolate and determine why the media player (MP) is offline.\n* Technician to reseat all cables connected to both the media player and the TV screen.\n* Technician to reseat the HDMI cable connecting the media player to the TV screen.\n* Technician to reboot both the media player and the TV screen.\n* Technician to ensure that the TV input is set to the correct HDMI source.\n* Technician to verify that the media player is online and that the TV screen is displaying content properly before leaving the site.\n\nREQUIRED (to be filled in on the SOW):\n- SCREEN HEALTH CHECK on all solutions. If dents, cracks or LED discolouration are noticed, take a clear photo.\n- LED Brightness: ensure brightness levels are consistent and adjustable without flickering or dim spots.\n- Signed SOW + photos MUST be sent to installations@engagis.com within 24 hours of job completion.\n\nINVOICING: cross-reference PO90543. No change to total -> accounts.payable@engagis.com. Change to total -> installations@engagis.com."
+  }
+]

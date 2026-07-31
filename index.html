@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f2c4c">
+<title>Galvo's SOW — Onsite Job Sheet</title>
+<link rel="manifest" href="manifest.json">
+<style>
+:root{
+  --navy:#0f2c4c; --navy-2:#17406e; --accent:#2f80ed; --bg:#eef1f5; --card:#fff;
+  --line:#d6dde6; --text:#182430; --muted:#61707f; --ok:#1e8e5a; --warn:#c9760b; --err:#c0392b;
+  --pad:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--text);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+h1,h2,h3{margin:0}
+button{font:inherit}
+a{color:var(--accent)}
+
+/* ---------- app chrome ---------- */
+.topbar{
+  position:sticky; top:0; z-index:50; background:var(--navy); color:#fff;
+  padding:calc(10px + env(safe-area-inset-top)) var(--pad) 10px;
+  display:flex; align-items:center; gap:10px; box-shadow:0 2px 8px rgba(0,0,0,.18);
+}
+.topbar .brand{font-weight:700; font-size:17px; letter-spacing:.2px}
+.topbar .sub{font-size:12px; opacity:.75; font-weight:400}
+.topbar .spacer{flex:1}
+.iconbtn{
+  background:rgba(255,255,255,.14); color:#fff; border:0; border-radius:8px;
+  padding:8px 12px; font-size:14px; font-weight:600; cursor:pointer;
+}
+.iconbtn:active{background:rgba(255,255,255,.28)}
+.wrap{padding:var(--pad); max-width:820px; margin:0 auto}
+.offline-flag{display:none; background:var(--warn); color:#fff; text-align:center; font-size:13px; padding:5px}
+body.is-offline .offline-flag{display:block}
+
+/* ---------- cards / list ---------- */
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:12px;
+  margin-bottom:12px; overflow:hidden; box-shadow:0 1px 2px rgba(16,32,50,.06);
+}
+.jobcard{display:block; width:100%; text-align:left; border:1px solid var(--line); background:#fff;
+  border-radius:12px; margin-bottom:10px; padding:12px 14px; cursor:pointer}
+.jobcard:active{background:#f4f7fb}
+.jobcard .row1{display:flex; align-items:flex-start; gap:8px}
+.jobcard .store{font-weight:700; font-size:16px; flex:1}
+.jobcard .meta{color:var(--muted); font-size:13px; margin-top:3px}
+.jobcard .issue{font-size:13.5px; margin-top:6px; color:#33414f}
+.pill{font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px;
+  padding:3px 8px; border-radius:20px; white-space:nowrap}
+.pill.new{background:#e6f0fb; color:#1a5fb4}
+.pill.progress{background:#fdf1de; color:#a25c00}
+.pill.done{background:#e3f5eb; color:#12704a}
+.pill.sent{background:#dbeee2; color:#0d5c3c}
+.pill.arch{background:#e9ecef; color:#5c6773}
+
+.sectionhead{font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.8px;
+  color:var(--muted); margin:18px 2px 8px}
+.empty{text-align:center; color:var(--muted); padding:40px 20px; font-size:15px}
+
+/* ---------- job detail ---------- */
+.jobhead{background:var(--navy-2); color:#fff; padding:14px var(--pad)}
+.jobhead .store{font-size:19px; font-weight:700}
+.jobhead .meta{font-size:13px; opacity:.85; margin-top:3px}
+.kv{display:grid; grid-template-columns:132px 1fr; gap:2px 10px; padding:12px 14px; font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0; font-weight:600; word-break:break-word}
+.card > h3{
+  background:#f6f8fb; border-bottom:1px solid var(--line); padding:11px 14px;
+  font-size:13px; text-transform:uppercase; letter-spacing:.7px; color:var(--navy);
+}
+.body{padding:12px 14px}
+.brief{white-space:pre-wrap; font-size:14px; line-height:1.5; background:#fbfcfe;
+  border:1px solid var(--line); border-radius:8px; padding:12px; max-height:260px; overflow:auto}
+.brief.expanded{max-height:none}
+.linkline{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px}
+.linkline a, .linkline button{
+  flex:1 1 auto; text-align:center; text-decoration:none; background:#eef3fa; color:var(--navy-2);
+  border:1px solid #cfdcec; border-radius:8px; padding:10px 12px; font-size:14px; font-weight:600; cursor:pointer;
+}
+
+label.f{display:block; margin:12px 0 5px; font-size:13px; font-weight:700; color:#34424f}
+label.f .req{color:var(--err); font-weight:700}
+input[type=text],input[type=time],input[type=date],input[type=email],input[type=number],textarea,select{
+  width:100%; padding:11px 12px; border:1px solid #c3cedb; border-radius:8px; background:#fff;
+  font:inherit; color:var(--text);
+}
+textarea{min-height:92px; resize:vertical}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accent); outline-offset:-1px; border-color:var(--accent)}
+.hint{font-size:12.5px; color:var(--muted); margin-top:4px}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
+@media (max-width:460px){ .grid3{grid-template-columns:1fr 1fr} .kv{grid-template-columns:112px 1fr} }
+
+.timerow{display:flex; gap:8px; align-items:flex-end}
+.timerow input{flex:1}
+.nowbtn{background:var(--navy-2); color:#fff; border:0; border-radius:8px; padding:11px 14px; font-weight:700; cursor:pointer; white-space:nowrap}
+
+.callout{border-left:4px solid var(--warn); background:#fff8ec; padding:10px 12px; border-radius:0 8px 8px 0;
+  font-size:13.5px; margin:10px 0}
+.callout.done{border-left-color:var(--ok); background:#f0faf4}
+.callout b{display:block; margin-bottom:2px}
+
+/* signature */
+.sigwrap{border:2px dashed #b9c6d6; border-radius:10px; background:#fff; position:relative; touch-action:none}
+.sigwrap canvas{display:block; width:100%; height:170px; border-radius:8px; touch-action:none}
+.sigwrap .ph{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  color:#a9b6c4; font-size:14px; pointer-events:none}
+.sigwrap.signed{border-style:solid; border-color:var(--ok)}
+.sigwrap.signed .ph{display:none}
+.sigbar{display:flex; justify-content:space-between; align-items:center; margin-top:6px}
+.clearsig{background:none;border:0;color:var(--err);font-size:13px;font-weight:600;cursor:pointer;padding:4px}
+
+/* items table */
+table.items{width:100%; border-collapse:collapse; font-size:14px}
+table.items th{text-align:left; font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; padding:0 0 6px}
+table.items td{padding:0 4px 8px 0; vertical-align:top}
+table.items td:last-child{padding-right:0}
+.delrow{background:#fdeceb;color:var(--err);border:0;border-radius:8px;width:38px;height:42px;font-size:18px;cursor:pointer}
+.addrow{background:#eef3fa;border:1px solid #cfdcec;color:var(--navy-2);border-radius:8px;padding:9px 12px;font-weight:600;cursor:pointer;font-size:14px}
+
+/* photos */
+.photogrid{display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:8px; margin-top:10px}
+.photo{position:relative; aspect-ratio:1; border-radius:8px; overflow:hidden; border:1px solid var(--line); background:#f2f5f9}
+.photo img{width:100%; height:100%; object-fit:cover; display:block}
+.photo button{position:absolute; top:4px; right:4px; background:rgba(0,0,0,.62); color:#fff; border:0;
+  border-radius:50%; width:24px; height:24px; font-size:14px; line-height:1; cursor:pointer}
+.photo .tag{position:absolute; left:0; right:0; bottom:0; background:rgba(0,0,0,.55); color:#fff;
+  font-size:10px; padding:3px 4px; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+
+/* radios */
+.radios{display:flex; gap:10px; margin-top:6px}
+.radios label{flex:1; border:1px solid #c3cedb; border-radius:8px; padding:12px; text-align:center;
+  font-weight:700; cursor:pointer; background:#fff}
+.radios input{display:none}
+.radios input:checked + span{color:#fff}
+.radios label:has(input:checked){background:var(--navy-2); border-color:var(--navy-2); color:#fff}
+
+/* actions */
+.actions{position:sticky; bottom:0; background:rgba(255,255,255,.96); backdrop-filter:blur(6px);
+  border-top:1px solid var(--line); padding:10px var(--pad) calc(10px + env(safe-area-inset-bottom));
+  display:flex; gap:8px; z-index:40}
+.btn{flex:1; border:0; border-radius:10px; padding:14px 6px; font-size:14px; font-weight:700; cursor:pointer; white-space:nowrap}
+.btn.primary{background:var(--navy); color:#fff}
+.btn.green{background:var(--ok); color:#fff}
+.btn.ghost{background:#eef3fa; color:var(--navy-2); border:1px solid #cfdcec}
+.btn:disabled{opacity:.45; cursor:not-allowed}
+.saveflag{font-size:12px; color:var(--ok); text-align:center; padding:4px; height:20px}
+
+.errbox{background:#fdeceb; border:1px solid #f3c3bf; color:#8e2a20; border-radius:8px;
+  padding:10px 12px; font-size:13.5px; margin:10px 0; display:none}
+.errbox ul{margin:6px 0 0 18px; padding:0}
+
+/* modal */
+.modal{position:fixed; inset:0; background:rgba(12,22,34,.55); display:none; z-index:100; align-items:center; justify-content:center; padding:16px}
+.modal.open{display:flex}
+.modal .inner{background:#fff; border-radius:14px; width:100%; max-width:560px; max-height:88vh; overflow:auto; padding:18px}
+.modal h3{margin-bottom:8px; font-size:17px}
+.modal textarea{min-height:180px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12.5px}
+
+/* ---------- print / SOW output ---------- */
+#printarea{display:none}
+@media print{
+  body{background:#fff}
+  .topbar,.wrap,.actions,.offline-flag,.modal{display:none !important}
+  #printarea{display:block !important}
+  @page{size:A4; margin:12mm}
+}
+#printarea{font-size:10.5pt; color:#000}
+#printarea .ph1{display:flex; justify-content:space-between; align-items:flex-start;
+  border-bottom:3px solid #0f2c4c; padding-bottom:8px; margin-bottom:12px}
+#printarea .ph1 h1{font-size:20pt; color:#0f2c4c; letter-spacing:.5px}
+#printarea .ph1 .co{text-align:right; font-size:8.5pt; line-height:1.35}
+#printarea table{width:100%; border-collapse:collapse; margin-bottom:10px}
+#printarea th,#printarea td{border:1px solid #6d7e90; padding:5px 6px; vertical-align:top; font-size:9.5pt}
+#printarea th{background:#dce6f1; text-align:left; font-weight:700; width:22%}
+#printarea .sec{font-weight:700; font-size:11pt; color:#0f2c4c; margin:14px 0 6px}
+#printarea .long{white-space:pre-wrap; min-height:52px}
+#printarea .sig{height:64px; text-align:center}
+#printarea .sig img{max-height:58px; max-width:100%}
+#printarea .foot{font-size:7.5pt; color:#444; margin-top:10px; line-height:1.35}
+#printarea .pbreak{page-break-before:always}
+#printarea .pgrid{display:grid; grid-template-columns:1fr 1fr; gap:6px}
+#printarea .pgrid figure{margin:0; border:1px solid #6d7e90; padding:4px; page-break-inside:avoid}
+#printarea .pgrid img{width:100%; display:block}
+#printarea .pgrid figcaption{font-size:8pt; padding-top:3px}
+#printarea .circ{display:inline-block; border:2px solid #000; border-radius:50%; padding:2px 9px; font-weight:700}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="brand">Galvo's SOW</div>
+    <div class="sub" id="topsub">Onsite job sheets</div>
+  </div>
+  <div class="spacer"></div>
+  <button class="iconbtn" id="btnBack" style="display:none">&larr; Jobs</button>
+  <button class="iconbtn" id="btnMenu">&#9776;</button>
+</div>
+<div class="offline-flag">Offline — everything still works, changes are saved on this device.</div>
+
+<!-- ============ JOB LIST ============ -->
+<div class="wrap" id="viewList">
+  <div class="sectionhead">Active jobs</div>
+  <div id="listActive"></div>
+  <div class="sectionhead">Completed</div>
+  <div id="listDone"></div>
+  <div class="sectionhead" id="archHead" style="cursor:pointer;user-select:none"></div>
+  <div id="listArch" style="display:none"></div>
+  <div style="height:16px"></div>
+  <button class="btn ghost" style="width:100%" id="btnNewBlank">+ New blank job sheet</button>
+  <div style="height:24px"></div>
+</div>
+
+<!-- ============ JOB DETAIL ============ -->
+<div class="wrap" id="viewJob" style="display:none">
+  <div class="card">
+    <div class="jobhead">
+      <div class="store" id="jhStore"></div>
+      <div class="meta" id="jhMeta"></div>
+    </div>
+    <dl class="kv" id="jhKv"></dl>
+  </div>
+
+  <div class="card">
+    <h3>Site visit requirements</h3>
+    <div class="body">
+      <dl class="kv" style="padding:0 0 10px" id="jhSite"></dl>
+      <div class="brief" id="jhBrief"></div>
+      <div class="linkline">
+        <button type="button" id="btnExpandBrief">Show full brief</button>
+        <a id="lnkMaps" href="#" target="_blank" rel="noopener">Navigate to site</a>
+        <a id="lnkContact" href="#">Call site contact</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Check-in / check-out</h3>
+    <div class="body">
+      <div class="callout" id="ciCallout"><b>Call Engagis Support 1300 203 810 (Option 1)</b>
+        On arrival to give your check-in time, and again before leaving for check-out. Must be confirmed by the store manager or onsite staff.</div>
+      <div class="grid2">
+        <div>
+          <label class="f">Tech arrival time</label>
+          <div class="timerow"><input type="time" id="f_arrive"><button class="nowbtn" data-now="f_arrive">Now</button></div>
+        </div>
+        <div>
+          <label class="f">Tech departure time</label>
+          <div class="timerow"><input type="time" id="f_depart"><button class="nowbtn" data-now="f_depart">Now</button></div>
+        </div>
+      </div>
+      <label class="f">Billable time</label>
+      <input type="text" id="f_billable" placeholder="e.g. 1.5 Hours">
+      <div class="hint" id="billHint">Auto-calculated from arrival/departure — 1 hr minimum call-out, rounded up to the next half hour. Edit if needed.</div>
+      <a class="linkline" href="tel:1300203810" style="display:block;margin-top:10px;text-align:center;background:#eef3fa;border:1px solid #cfdcec;border-radius:8px;padding:11px;font-weight:700;text-decoration:none">Call Engagis Support &mdash; 1300 203 810</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Completed job summary (mandatory)</h3>
+    <div class="body">
+      <label class="f">Identified root cause <span class="req">*</span></label>
+      <textarea id="f_rootcause" placeholder="If unknown, write 'Unknown'"></textarea>
+      <label class="f">Steps taken to resolve <span class="req">*</span></label>
+      <textarea id="f_steps" placeholder="What you actually did onsite, in order"></textarea>
+      <label class="f">Preventative recommendations <span class="req">*</span></label>
+      <textarea id="f_prevent" placeholder="What would stop this happening again"></textarea>
+
+      <label class="f">List of items to be returned</label>
+      <table class="items">
+        <thead><tr><th>Item name</th><th>Serial number</th><th style="width:44px"></th></tr></thead>
+        <tbody id="itemsBody"></tbody>
+      </table>
+      <button type="button" class="addrow" id="btnAddItem">+ Add item</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Screen health check</h3>
+    <div class="body">
+      <div class="hint" style="margin:0 0 8px">Check every solution onsite. If you see dents, cracks or LED discolouration, note it and take a clear photo below.</div>
+      <label class="f">Screen health check <span class="req">*</span></label>
+      <textarea id="f_screen" placeholder="Write 'None' if there are no issues — burn marks, cracks, discolouration etc."></textarea>
+      <label class="f">LED brightness <span class="req">*</span></label>
+      <textarea id="f_led" style="min-height:64px" placeholder="Brightness consistent and adjustable, no flickering or dim spots?"></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Photos</h3>
+    <div class="body">
+      <div class="hint" style="margin:0 0 8px">Engagis requires photos of the solutions/devices with the signed SOW. Photos are resized on-device and stored offline.</div>
+      <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
+      <button type="button" class="addrow" id="btnAddPhoto" style="width:100%;padding:13px">Take / attach photos</button>
+      <div class="photogrid" id="photoGrid"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Engagis SOW PDF</h3>
+    <div class="body">
+      <div class="hint" style="margin:0 0 8px">Attach the SOW PDF Engagis emailed for this job. "Build SOW pack" returns their document untouched, with your completed summary, both signatures and the photos added on the end &mdash; one file, ready to send.</div>
+      <input type="file" id="sowInput" accept="application/pdf,.pdf" style="display:none">
+      <button type="button" class="addrow" id="btnAttachSow" style="width:100%;padding:13px">Attach Engagis SOW PDF</button>
+      <div id="sowStatus" class="hint" style="margin-top:9px"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Technician sign-off</h3>
+    <div class="body">
+      <div class="grid2">
+        <div><label class="f">Name</label><input type="text" id="f_techname"></div>
+        <div><label class="f">Date</label><input type="date" id="f_techdate"></div>
+      </div>
+      <label class="f">Technician signature <span class="req">*</span></label>
+      <div class="sigwrap" id="wrapTech"><canvas id="sigTech"></canvas><div class="ph">Sign here</div></div>
+      <div class="sigbar"><span class="hint" id="techStamp"></span><button type="button" class="clearsig" data-clear="sigTech">Clear</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Customer sign-off</h3>
+    <div class="body">
+      <div style="font-size:14px">"I am satisfied and can attest that the work has been completed and the issue has been resolved."</div>
+      <label class="f">Customer confirms work complete <span class="req">*</span></label>
+      <div class="radios">
+        <label><input type="radio" name="satisfied" value="Yes"><span>Yes</span></label>
+        <label><input type="radio" name="satisfied" value="No"><span>No</span></label>
+      </div>
+      <div class="grid2">
+        <div><label class="f">Customer name <span class="req">*</span></label><input type="text" id="f_custname"></div>
+        <div><label class="f">Date</label><input type="date" id="f_custdate"></div>
+      </div>
+      <label class="f">Customer signature <span class="req">*</span></label>
+      <div class="sigwrap" id="wrapCust"><canvas id="sigCust"></canvas><div class="ph">Hand the phone to the customer</div></div>
+      <div class="sigbar"><span class="hint" id="custStamp"></span><button type="button" class="clearsig" data-clear="sigCust">Clear</button></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="body" style="text-align:center">
+      <button type="button" class="addrow" id="btnArchive" style="width:100%;padding:12px"></button>
+      <div class="hint" id="archHint" style="margin-top:7px"></div>
+    </div>
+  </div>
+
+  <div class="errbox" id="errBox"></div>
+  <div class="saveflag" id="saveFlag"></div>
+  <div style="height:8px"></div>
+</div>
+
+<div class="actions" id="jobActions" style="display:none">
+  <button class="btn ghost" id="btnStamp">Build SOW pack</button>
+  <button class="btn ghost" id="btnPdf">Own PDF</button>
+  <button class="btn green" id="btnSend">Email</button>
+</div>
+
+<!-- ============ MENU MODAL ============ -->
+<div class="modal" id="menuModal">
+  <div class="inner">
+    <h3>Menu</h3>
+    <p class="hint" style="margin-top:0">Galvo's IT Solutions &middot; steven.galvin@gitsolutions.au &middot; ABN 97 523 921 917<br>
+      <b>Build 2026-07-30b</b> &mdash; fills the SOW in place &middot; archive &middot; live scan</p>
+    <button class="btn primary" style="width:100%;margin-bottom:8px" id="btnScan">Scan Outlook for new jobs</button>
+    <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnImport">Import jobs (paste JSON)</button>
+    <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnSync">Refresh jobs from jobs.json</button>
+    <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnBackup">Download backup of all jobs</button>
+    <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnScanCfg">Scan settings (API address &amp; key)</button>
+    <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnForceUpdate">Force update to latest build</button>
+    <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnCloseMenu">Close</button>
+    <div id="importPane" style="display:none">
+      <label class="f">Paste job JSON</label>
+      <textarea id="importText" placeholder='[{"store":"...","case":"...", ...}]'></textarea>
+      <button class="btn primary" style="width:100%;margin-top:8px" id="btnDoImport">Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PRINT OUTPUT ============ -->
+<div id="printarea"></div>
+
+<script src="pdf-lib.min.js"></script>
+<script src="pdf.min.js"></script>
+<script>
+"use strict";
+/* =========================================================================
+   Galvo's SOW — offline onsite job sheet
+   Data model per job:
+   { id, status, store, case, po, requestedBy, issuedTo, issueDate,
+     contactName, contactPhone, contactEmail, siteAddress,
+     issue, device, ltId, token, jobDate, timeAllocated, jobTime, brief,
+     form:{...}, items:[{name,serial}], photos:[{id,data,caption}],
+     sigTech, sigCust, sigTechAt, sigCustAt, sentAt, updatedAt }
+   ========================================================================= */
+
+var TECH_NAME = "Steven Galvin";
+var TECH_BIZ  = "Galvo's IT Solutions";
+var TECH_EMAIL= "steven.galvin@gitsolutions.au";
+var TECH_PH   = "0413 604 477";
+var TECH_ABN  = "97 523 921 917";
+var ENGAGIS_TO= "installations@engagis.com";
+
+/* ---------- tiny IndexedDB wrapper ---------- */
+var DB=null;
+function db(){
+  return new Promise(function(res,rej){
+    if(DB) return res(DB);
+    var r=indexedDB.open("galvo-sow",1);
+    r.onupgradeneeded=function(e){
+      var d=e.target.result;
+      if(!d.objectStoreNames.contains("jobs")) d.createObjectStore("jobs",{keyPath:"id"});
+    };
+    r.onsuccess=function(){DB=r.result;res(DB)};
+    r.onerror=function(){rej(r.error)};
+  });
+}
+function txAll(){
+  return db().then(function(d){
+    return new Promise(function(res,rej){
+      var out=[], c=d.transaction("jobs","readonly").objectStore("jobs").openCursor();
+      c.onsuccess=function(e){var cur=e.target.result; if(cur){out.push(cur.value);cur.continue()}else res(out)};
+      c.onerror=function(){rej(c.error)};
+    });
+  });
+}
+function put(job){
+  job.updatedAt=new Date().toISOString();
+  return db().then(function(d){
+    return new Promise(function(res,rej){
+      var t=d.transaction("jobs","readwrite"); t.objectStore("jobs").put(job);
+      t.oncomplete=function(){res(job)}; t.onerror=function(){rej(t.error)};
+    });
+  });
+}
+
+/* ---------- helpers ---------- */
+function $(id){return document.getElementById(id)}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function uid(){return "j"+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+function todayISO(){var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function nowHHMM(){var d=new Date(); return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}
+function fmtDate(iso){ if(!iso) return ""; var p=String(iso).split("-"); if(p.length!==3) return iso;
+  var m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return p[2]+" "+m[+p[1]-1]+" "+p[0]; }
+
+var STATE={jobs:[], current:null, showArch:false};
+
+/* ---------- job list ---------- */
+var ARCHIVE_AFTER_DAYS=30;
+function statusOf(j){
+  if(j.archivedAt) return {k:"arch",t:"Archived"};
+  if(j.sentAt) return {k:"sent",t:"Sent"};
+  if(j.sigCust) return {k:"done",t:"Signed"};
+  if(j.form && (j.form.arrive||j.form.rootcause)) return {k:"progress",t:"In progress"};
+  return {k:"new",t:"New"};
+}
+function renderList(){
+  var act=[],done=[],arch=[];
+  STATE.jobs.slice().sort(function(a,b){
+    return String(b.jobDate||b.issueDate||"").localeCompare(String(a.jobDate||a.issueDate||""));
+  }).forEach(function(j){ (j.archivedAt?arch:(j.sentAt?done:act)).push(j) });
+
+  function card(j){
+    var s=statusOf(j);
+    return '<button class="jobcard" data-open="'+esc(j.id)+'">'+
+      '<div class="row1"><div class="store">'+esc(j.store||"Untitled job")+'</div>'+
+      '<span class="pill '+s.k+'">'+s.t+'</span></div>'+
+      '<div class="meta">'+[j.case?"Case "+esc(j.case):"", j.po?esc(j.po):"", j.jobDate?fmtDate(j.jobDate):""]
+        .filter(Boolean).join(" &middot; ")+'</div>'+
+      (j.issue?'<div class="issue">'+esc(j.issue)+'</div>':'')+
+      '</button>';
+  }
+  $("listActive").innerHTML = act.length?act.map(card).join(""):'<div class="empty">No active jobs. Add one from the menu, or ask Claude to scan Outlook.</div>';
+  $("listDone").innerHTML   = done.length?done.map(card).join(""):'<div class="empty">Nothing sent yet.</div>';
+
+  $("archHead").innerHTML = arch.length
+    ? "Archived ("+arch.length+")  "+(STATE.showArch?"&#9662;":"&#9656;")
+    : "";
+  $("archHead").style.display = arch.length ? "" : "none";
+  $("listArch").style.display = (arch.length && STATE.showArch) ? "" : "none";
+  $("listArch").innerHTML = arch.map(card).join("");
+}
+
+/* Sent jobs drop into Archive on their own after a month, so the list stays
+   short without anything ever being deleted. */
+function autoArchive(){
+  var cutoff=Date.now()-ARCHIVE_AFTER_DAYS*86400000, chain=Promise.resolve(), n=0;
+  STATE.jobs.forEach(function(j){
+    if(j.archivedAt || !j.sentAt) return;
+    if(new Date(j.sentAt).getTime()>cutoff) return;
+    j.archivedAt=new Date().toISOString(); j.autoArchived=true; n++;
+    chain=chain.then(function(){ return put(j) });
+  });
+  return n?chain.then(load):Promise.resolve();
+}
+
+/* ---------- open a job ---------- */
+function flush(){
+  clearTimeout(saveTimer);
+  if(!STATE.current) return Promise.resolve();
+  collect();
+  return put(STATE.current);
+}
+function openJob(id){
+  var j=STATE.jobs.filter(function(x){return x.id===id})[0];
+  if(!j) return;
+  if(STATE.current && STATE.current.id!==id) flush();
+  STATE.current=j;
+  j.form=j.form||{}; j.items=j.items||[]; j.photos=j.photos||[];
+
+  $("viewList").style.display="none";
+  $("viewJob").style.display="block";
+  $("jobActions").style.display="flex";
+  $("btnBack").style.display="inline-block";
+  $("topsub").textContent=j.case?("Case "+j.case):"Job sheet";
+  window.scrollTo(0,0);
+
+  $("jhStore").textContent=j.store||"Untitled job";
+  $("jhMeta").textContent=[j.case?"Engagis Case "+j.case:"", j.po||"", j.jobDate?fmtDate(j.jobDate):""].filter(Boolean).join("  •  ");
+
+  function dl(pairs){ return pairs.filter(function(p){return p[1]}).map(function(p){
+    return "<dt>"+esc(p[0])+"</dt><dd>"+esc(p[1]).replace(/\n/g,"<br>")+"</dd>"}).join("") }
+
+  $("jhKv").innerHTML=dl([
+    ["Issued to",j.issuedTo||TECH_BIZ],["Engagis PO",j.po],["Engagis case",j.case],
+    ["Requested by",j.requestedBy],["Issued",fmtDate(j.issueDate)],
+    ["Contact",j.contactName],["Phone",j.contactPhone],["Email",j.contactEmail],
+    ["Site address",j.siteAddress]
+  ]);
+  $("jhSite").innerHTML=dl([
+    ["Reported issue",j.issue],["Device name",j.device],["Tech job date",fmtDate(j.jobDate)],
+    ["LT ID",j.ltId],["Time allocated",j.timeAllocated],["One-time token",j.token],["Tech job time",j.jobTime]
+  ]);
+  $("jhBrief").textContent=j.brief||"No detailed brief captured. Check the original email.";
+  $("jhBrief").classList.remove("expanded");
+  $("btnExpandBrief").textContent="Show full brief";
+
+  var addr=j.siteAddress||j.store||"";
+  $("lnkMaps").href="https://maps.google.com/?q="+encodeURIComponent(addr);
+  var ph=(j.contactPhone||"").replace(/[^0-9+]/g,"");
+  $("lnkContact").href= ph?("tel:"+ph):"#";
+  $("lnkContact").textContent= j.contactName?("Call "+j.contactName):"Call site contact";
+  $("lnkContact").style.display= ph?"":"none";
+
+  var f=j.form;
+  $("f_arrive").value=f.arrive||""; $("f_depart").value=f.depart||""; $("f_billable").value=f.billable||"";
+  $("f_rootcause").value=f.rootcause||""; $("f_steps").value=f.steps||""; $("f_prevent").value=f.prevent||"";
+  $("f_screen").value=f.screen||""; $("f_led").value=f.led||"";
+  $("f_techname").value=f.techname||TECH_NAME; $("f_techdate").value=f.techdate||j.jobDate||todayISO();
+  $("f_custname").value=f.custname||j.contactName||"";
+  $("f_custdate").value=f.custdate||j.jobDate||todayISO();
+  Array.prototype.forEach.call(document.getElementsByName("satisfied"),function(r){r.checked=(f.satisfied===r.value)});
+
+  renderItems(); renderPhotos(); refreshCallout(); renderSowStatus(); renderArchiveBtn();
+  loadSig("sigTech",j.sigTech); loadSig("sigCust",j.sigCust);
+  $("techStamp").textContent=j.sigTechAt?("Signed "+new Date(j.sigTechAt).toLocaleString()):"";
+  $("custStamp").textContent=j.sigCustAt?("Signed "+new Date(j.sigCustAt).toLocaleString()):"";
+  $("errBox").style.display="none";
+}
+function backToList(){
+  flush().then(function(){
+    STATE.current=null;
+    $("viewJob").style.display="none"; $("jobActions").style.display="none";
+    $("btnBack").style.display="none"; $("viewList").style.display="block";
+    $("topsub").textContent="Onsite job sheets";
+    return load();
+  }).then(function(){ window.scrollTo(0,0) });
+}
+
+/* ---------- autosave ---------- */
+var saveTimer=null;
+function collect(){
+  var j=STATE.current; if(!j) return;
+  var sat=document.querySelector('input[name="satisfied"]:checked');
+  j.form={
+    arrive:$("f_arrive").value, depart:$("f_depart").value, billable:$("f_billable").value,
+    rootcause:$("f_rootcause").value, steps:$("f_steps").value, prevent:$("f_prevent").value,
+    screen:$("f_screen").value, led:$("f_led").value,
+    techname:$("f_techname").value, techdate:$("f_techdate").value,
+    custname:$("f_custname").value, custdate:$("f_custdate").value,
+    satisfied: sat?sat.value:""
+  };
+  j.items=Array.prototype.map.call($("itemsBody").rows,function(r){
+    return {name:r.cells[0].firstChild.value, serial:r.cells[1].firstChild.value};
+  }).filter(function(i){return i.name||i.serial});
+}
+function scheduleSave(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(function(){
+    collect();
+    if(!STATE.current) return;
+    put(STATE.current).then(function(){
+      $("saveFlag").textContent="Saved "+new Date().toLocaleTimeString();
+      setTimeout(function(){$("saveFlag").textContent=""},2200);
+    });
+  },500);
+}
+document.addEventListener("input",function(e){
+  if(!STATE.current) return;
+  if(e.target.closest("#viewJob")){ scheduleSave(); if(e.target.id==="f_arrive"||e.target.id==="f_depart"){autoBillable();refreshCallout()} }
+});
+document.addEventListener("change",function(e){
+  if(STATE.current && e.target.closest("#viewJob")) scheduleSave();
+});
+
+/* ---------- billable time ---------- */
+function autoBillable(){
+  var a=$("f_arrive").value, d=$("f_depart").value;
+  if(!a||!d) return;
+  var pa=a.split(":"), pd=d.split(":");
+  var mins=(+pd[0]*60 + +pd[1]) - (+pa[0]*60 + +pa[1]);
+  if(mins<0) mins+=1440;
+  var hrs=Math.max(1, Math.ceil(mins/30)/2);
+  $("f_billable").value=hrs+(hrs===1?" Hour":" Hours");
+}
+function refreshCallout(){
+  var a=$("f_arrive").value, d=$("f_depart").value, el=$("ciCallout");
+  if(a&&d){ el.className="callout done";
+    el.innerHTML="<b>Check-in "+esc(a)+" &middot; check-out "+esc(d)+"</b>Both times recorded. Confirm you called 1300 203 810 for each.";
+  } else if(a){ el.className="callout";
+    el.innerHTML="<b>Checked in at "+esc(a)+"</b>Before you leave, call 1300 203 810 (Option 1) with your check-out time and get it confirmed by the manager or onsite staff.";
+  } else { el.className="callout";
+    el.innerHTML="<b>Call Engagis Support 1300 203 810 (Option 1)</b>On arrival to give your check-in time, and again before leaving for check-out. Must be confirmed by the store manager or onsite staff.";
+  }
+}
+document.addEventListener("click",function(e){
+  var n=e.target.getAttribute&&e.target.getAttribute("data-now");
+  if(n){ $(n).value=nowHHMM(); autoBillable(); refreshCallout(); scheduleSave(); }
+});
+
+/* ---------- returned items ---------- */
+function itemRow(it){
+  var tr=document.createElement("tr");
+  tr.innerHTML='<td><input type="text" placeholder="Item name"></td>'+
+               '<td><input type="text" placeholder="Serial number"></td>'+
+               '<td><button type="button" class="delrow">&times;</button></td>';
+  tr.cells[0].firstChild.value=(it&&it.name)||"";
+  tr.cells[1].firstChild.value=(it&&it.serial)||"";
+  tr.cells[2].firstChild.onclick=function(){tr.remove();scheduleSave()};
+  return tr;
+}
+function renderItems(){
+  var b=$("itemsBody"); b.innerHTML="";
+  var its=(STATE.current.items||[]);
+  if(!its.length) its=[null];
+  its.forEach(function(it){b.appendChild(itemRow(it))});
+}
+$("btnAddItem").onclick=function(){ $("itemsBody").appendChild(itemRow()) };
+
+/* ---------- photos ---------- */
+$("btnAddPhoto").onclick=function(){ $("photoInput").click() };
+$("photoInput").onchange=function(e){
+  var files=Array.prototype.slice.call(e.target.files||[]);
+  var done=0;
+  files.forEach(function(file){
+    var fr=new FileReader();
+    fr.onload=function(){
+      var img=new Image();
+      img.onload=function(){
+        var max=1500, s=Math.min(1,max/Math.max(img.width,img.height));
+        var c=document.createElement("canvas");
+        c.width=Math.round(img.width*s); c.height=Math.round(img.height*s);
+        c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+        STATE.current.photos.push({id:uid(), data:c.toDataURL("image/jpeg",0.72), caption:""});
+        if(++done===files.length){ renderPhotos(); put(STATE.current) }
+      };
+      img.src=fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+  e.target.value="";
+};
+function renderPhotos(){
+  var g=$("photoGrid"), ps=STATE.current.photos||[];
+  g.innerHTML=ps.map(function(p,i){
+    return '<div class="photo"><img src="'+p.data+'" alt="Photo '+(i+1)+'">'+
+      '<button type="button" data-delphoto="'+p.id+'">&times;</button>'+
+      '<div class="tag">Photo '+(i+1)+'</div></div>';
+  }).join("");
+}
+document.addEventListener("click",function(e){
+  var id=e.target.getAttribute&&e.target.getAttribute("data-delphoto");
+  if(id&&STATE.current){
+    STATE.current.photos=STATE.current.photos.filter(function(p){return p.id!==id});
+    renderPhotos(); put(STATE.current);
+  }
+});
+
+/* ---------- signature pads ---------- */
+var PADS={};
+function initPad(canvasId, wrapId, onDone){
+  var c=$(canvasId), wrap=$(wrapId), ctx;
+  function size(){
+    var r=c.getBoundingClientRect(), dpr=window.devicePixelRatio||1;
+    var prev=PADS[canvasId]&&PADS[canvasId].data;
+    c.width=Math.round(r.width*dpr); c.height=Math.round(r.height*dpr);
+    ctx=c.getContext("2d"); ctx.scale(dpr,dpr);
+    ctx.lineWidth=2.2; ctx.lineCap="round"; ctx.lineJoin="round"; ctx.strokeStyle="#10233a";
+    if(prev){ var im=new Image(); im.onload=function(){ctx.drawImage(im,0,0,r.width,r.height)}; im.src=prev; }
+  }
+  var drawing=false, last=null, dirty=false;
+  function pos(ev){
+    var r=c.getBoundingClientRect();
+    var t=ev.touches?ev.touches[0]:ev;
+    return {x:t.clientX-r.left, y:t.clientY-r.top};
+  }
+  function start(ev){ ev.preventDefault(); drawing=true; last=pos(ev); }
+  function move(ev){
+    if(!drawing) return; ev.preventDefault();
+    var p=pos(ev);
+    ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke();
+    last=p; dirty=true; wrap.classList.add("signed");
+  }
+  function end(){ if(!drawing) return; drawing=false; if(dirty){ PADS[canvasId].data=c.toDataURL("image/png"); onDone&&onDone(PADS[canvasId].data) } }
+  c.addEventListener("pointerdown",start); c.addEventListener("pointermove",move);
+  window.addEventListener("pointerup",end); c.addEventListener("pointerleave",end);
+  c.addEventListener("touchstart",start,{passive:false}); c.addEventListener("touchmove",move,{passive:false});
+  c.addEventListener("touchend",end);
+  PADS[canvasId]={canvas:c, wrap:wrap, data:null, size:size,
+    clear:function(){ var r=c.getBoundingClientRect(); ctx.clearRect(0,0,r.width,r.height); PADS[canvasId].data=null; wrap.classList.remove("signed"); },
+    load:function(d){ size(); PADS[canvasId].data=d||null;
+      if(d){ var im=new Image(); im.onload=function(){var r=c.getBoundingClientRect(); ctx.drawImage(im,0,0,r.width,r.height)}; im.src=d; wrap.classList.add("signed"); }
+      else { wrap.classList.remove("signed"); } }
+  };
+  size();
+}
+function loadSig(id,data){ PADS[id].clear(); PADS[id].load(data) }
+initPad("sigTech","wrapTech",function(d){
+  if(!STATE.current) return;
+  STATE.current.sigTech=d; STATE.current.sigTechAt=new Date().toISOString();
+  $("techStamp").textContent="Signed "+new Date().toLocaleString(); put(STATE.current);
+});
+initPad("sigCust","wrapCust",function(d){
+  if(!STATE.current) return;
+  STATE.current.sigCust=d; STATE.current.sigCustAt=new Date().toISOString();
+  $("custStamp").textContent="Signed "+new Date().toLocaleString(); put(STATE.current);
+});
+document.addEventListener("click",function(e){
+  var t=e.target.getAttribute&&e.target.getAttribute("data-clear");
+  if(t&&STATE.current){
+    PADS[t].clear();
+    if(t==="sigTech"){STATE.current.sigTech=null;STATE.current.sigTechAt=null;$("techStamp").textContent=""}
+    else {STATE.current.sigCust=null;STATE.current.sigCustAt=null;$("custStamp").textContent=""}
+    put(STATE.current);
+  }
+});
+window.addEventListener("resize",function(){ if(STATE.current){ loadSig("sigTech",STATE.current.sigTech); loadSig("sigCust",STATE.current.sigCust) } });
+
+/* ---------- validation ---------- */
+function validate(){
+  collect();
+  var j=STATE.current, f=j.form, e=[];
+  if(!f.arrive) e.push("Tech arrival time");
+  if(!f.depart) e.push("Tech departure time");
+  if(!f.rootcause.trim()) e.push("Identified root cause (write 'Unknown' if not known)");
+  if(!f.steps.trim()) e.push("Steps taken to resolve");
+  if(!f.prevent.trim()) e.push("Preventative recommendations");
+  if(!f.screen.trim()) e.push("Screen health check (write 'None' if no issues)");
+  if(!f.led.trim()) e.push("LED brightness");
+  if(!j.sigTech) e.push("Technician signature");
+  if(!f.satisfied) e.push("Customer sign-off — Yes or No");
+  if(!f.custname.trim()) e.push("Customer name");
+  if(!j.sigCust) e.push("Customer signature");
+  if(!(j.photos||[]).length) e.push("At least one photo of the solution/device");
+  var box=$("errBox");
+  if(e.length){
+    box.innerHTML="<b>Still to complete before this can be sent:</b><ul>"+e.map(function(x){return "<li>"+esc(x)+"</li>"}).join("")+"</ul>";
+    box.style.display="block"; box.scrollIntoView({behavior:"smooth",block:"center"});
+    return false;
+  }
+  box.style.display="none"; return true;
+}
+
+/* ---------- build printable SOW ---------- */
+function buildPrint(){
+  collect();
+  var j=STATE.current, f=j.form;
+  function row(a,b,c,d){
+    return "<tr><th>"+esc(a)+"</th><td>"+esc(b||"")+"</td>"+
+      (c!==undefined?"<th>"+esc(c)+"</th><td>"+esc(d||"")+"</td>":"<td colspan='2'></td>")+"</tr>";
+  }
+  var items=(j.items||[]);
+  var itemRows = items.length
+    ? items.map(function(i){return "<tr><td>"+esc(i.name)+"</td><td>"+esc(i.serial)+"</td></tr>"}).join("")
+    : "<tr><td>Nil</td><td>Nil</td></tr>";
+
+  var yes = f.satisfied==="Yes", no = f.satisfied==="No";
+
+  var html =
+  '<div class="ph1"><div><h1>STATEMENT OF WORK</h1>'+
+    '<div style="font-size:9pt;color:#333">Completed job summary &amp; sign-off</div></div>'+
+    '<div class="co"><b>'+esc(TECH_BIZ)+'</b><br>'+esc(TECH_NAME)+'<br>'+esc(TECH_EMAIL)+'<br>'+esc(TECH_PH)+'<br>ABN '+esc(TECH_ABN)+'</div></div>'+
+
+  '<table>'+
+    row("Issued to", j.issuedTo||TECH_BIZ, "Store Location", j.store)+
+    row("Engagis PO", j.po, "Contact Name", j.contactName)+
+    row("Engagis Case", j.case, "Phone No", j.contactPhone)+
+    row("Requested by", j.requestedBy, "Email Address", j.contactEmail)+
+    row("Form Issuance Date", fmtDate(j.issueDate), "Site Address", j.siteAddress)+
+  '</table>'+
+
+  '<div class="sec">Site Visit Requirements</div>'+
+  '<table>'+
+    '<tr><th>Reported Issue</th><td colspan="3">'+esc(j.issue||"")+'</td></tr>'+
+    row("Device Name", j.device, "Tech Job Date", fmtDate(j.jobDate))+
+    row("LT ID", j.ltId, "Time Allocated", j.timeAllocated)+
+    row("One-Time Token", j.token, "Tech Job Time", j.jobTime)+
+  '</table>'+
+
+  '<div class="sec">Completed Job Summary</div>'+
+  '<table>'+
+    '<tr><th>Tech Arrival Time</th><td>'+esc(f.arrive)+'</td>'+
+        '<th>Tech Departure Time</th><td>'+esc(f.depart)+'</td></tr>'+
+    '<tr><th>Billable Time</th><td colspan="3">'+esc(f.billable)+'</td></tr>'+
+    '<tr><th>Identified Root Cause</th><td colspan="3" class="long">'+esc(f.rootcause)+'</td></tr>'+
+    '<tr><th>Steps Taken to Resolve</th><td colspan="3" class="long">'+esc(f.steps)+'</td></tr>'+
+    '<tr><th>Preventative Recommendations</th><td colspan="3" class="long">'+esc(f.prevent)+'</td></tr>'+
+  '</table>'+
+
+  '<table><tr><th style="width:50%">Item Name</th><th style="width:50%">Serial Number</th></tr>'+itemRows+'</table>'+
+
+  '<table>'+
+    '<tr><th>Screen Health Check</th><td colspan="3" class="long">'+esc(f.screen)+'</td></tr>'+
+    '<tr><th>LED Brightness</th><td colspan="3" class="long">'+esc(f.led)+'</td></tr>'+
+  '</table>'+
+
+  '<table>'+
+    '<tr><th>Technician Signature</th><td class="sig">'+(j.sigTech?'<img src="'+j.sigTech+'">':'')+'</td>'+
+        '<th style="width:12%">Name</th><td>'+esc(f.techname)+'</td></tr>'+
+    '<tr><th>Date</th><td>'+esc(fmtDate(f.techdate))+'</td><th>Signed at</th><td>'+
+        esc(j.sigTechAt?new Date(j.sigTechAt).toLocaleString():"")+'</td></tr>'+
+  '</table>'+
+
+  '<div class="sec">Customer Sign-Off</div>'+
+  '<div style="font-size:9.5pt;margin-bottom:5px">I am satisfied and can attest that the work has been completed and the issue has been resolved.</div>'+
+  '<table>'+
+    '<tr><th>Work complete</th><td>'+(yes?'<span class="circ">YES</span>':'YES')+' &nbsp;&nbsp; '+(no?'<span class="circ">NO</span>':'NO')+'</td>'+
+        '<th style="width:14%">Customer Name</th><td>'+esc(f.custname)+'</td></tr>'+
+    '<tr><th>Customer Signature</th><td class="sig">'+(j.sigCust?'<img src="'+j.sigCust+'">':'')+'</td>'+
+        '<th>Date</th><td>'+esc(fmtDate(f.custdate))+'</td></tr>'+
+    '<tr><th>Signature captured</th><td colspan="3" style="font-size:8.5pt">'+
+        esc(j.sigCustAt?new Date(j.sigCustAt).toLocaleString():"")+
+        ' &middot; captured electronically on device &middot; '+esc(navigator.userAgent.slice(0,90))+'</td></tr>'+
+  '</table>'+
+
+  '<div class="foot">Signature captured electronically onsite by '+esc(TECH_BIZ)+'. '+
+   'This document contains privileged and confidential information only for the addressee named above. If you are not the intended recipient, '+
+   'you must not disseminate, copy or take any action in reliance on it.</div>';
+
+  var ps=(j.photos||[]);
+  if(ps.length){
+    html+='<div class="pbreak"><div class="sec">Photos — '+esc(j.store||"")+
+      (j.case?" (Case "+esc(j.case)+")":"")+'</div><div class="pgrid">'+
+      ps.map(function(p,i){return '<figure><img src="'+p.data+'"><figcaption>Photo '+(i+1)+'</figcaption></figure>'}).join("")+
+      '</div></div>';
+  }
+  $("printarea").innerHTML=html;
+}
+
+/* =========================================================================
+   Build the SOW pack: the original Engagis SOW, untouched, followed by a
+   completed job summary + sign-off page and the photos.
+
+   Deliberately NOT stamping into their page. Engagis regenerate the SOW per
+   job and the job brief length varies, so the summary table lands on a
+   different page at a different height every time — fixed coordinates drift.
+   ========================================================================= */
+
+$("btnAttachSow").onclick=function(){ $("sowInput").click() };
+$("sowInput").onchange=function(e){
+  var f=e.target.files&&e.target.files[0]; if(!f) return;
+  var fr=new FileReader();
+  fr.onload=function(){
+    STATE.current.sowPdf=fr.result; STATE.current.sowPdfName=f.name;
+    put(STATE.current).then(renderSowStatus);
+  };
+  fr.readAsDataURL(f); e.target.value="";
+};
+function renderSowStatus(){
+  var j=STATE.current; if(!j) return;
+  if(j.sowPdf){
+    $("sowStatus").innerHTML="Attached: <b>"+esc(j.sowPdfName||"SOW.pdf")+
+      "</b><br>&ldquo;Build SOW pack&rdquo; will return this file with your signed summary added. "+
+      "<button type='button' class='clearsig' id='btnDropSow'>Remove</button>";
+  } else {
+    $("sowStatus").innerHTML="Nothing attached &mdash; &ldquo;Build SOW pack&rdquo; is off. "+
+      "Use &ldquo;Own PDF&rdquo; to produce a standalone job sheet instead.";
+  }
+  $("btnStamp").disabled=!j.sowPdf;
+}
+document.addEventListener("click",function(e){
+  if(e.target.id==="btnDropSow" && STATE.current){
+    STATE.current.sowPdf=null; STATE.current.sowPdfName=null;
+    put(STATE.current).then(renderSowStatus);
+  }
+});
+
+function dataUrlToBytes(d){
+  var b=atob(String(d).split(",")[1]), a=new Uint8Array(b.length);
+  for(var i=0;i<b.length;i++) a[i]=b.charCodeAt(i);
+  return a;
+}
+function wrapPdf(text,font,size,maxw){
+  var out=[];
+  String(text).split("\n").forEach(function(para){
+    var line="";
+    para.split(/\s+/).forEach(function(w){
+      if(!w) return;
+      var trial=line?line+" "+w:w;
+      if(font.widthOfTextAtSize(trial,size)<=maxw){ line=trial }
+      else { if(line) out.push(line); line=w }
+    });
+    out.push(line);
+  });
+  return out;
+}
+function saveBlob(bytes,name){
+  var blob=new Blob([bytes],{type:"application/pdf"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url; a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url) },4000);
+}
+
+function stampSow(){
+  var j=STATE.current, f=j.form, P=window.PDFLib;
+  var doc, font, bold, sigT=null, sigC=null, pics=[], overflow=[], model=null, missed=[];
+
+  /* Which label identifies each field, and where the value cell sits relative
+     to that label's cell. No coordinates anywhere: the cells come out of the
+     PDF's own table geometry, so this works on any Engagis template — the
+     2-page one, the 3-page one, and the older single-page one. */
+  var FIELDS=[
+    {k:"arrive",     label:"Tech Arrival Time",    dir:"right"},
+    {k:"depart",     label:"Tech Departure Time",  dir:"right"},
+    {k:"billable",   label:"Billable Time",        dir:"right"},
+    {k:"rootcause",  label:"Identified Root Cause",dir:"right", clear:1},
+    {k:"steps",      label:"Steps Taken to",       dir:"right", clear:1},
+    {k:"prevent",    label:"Preventative",         dir:"right", clear:1},
+    {k:"itemname",   label:"Item Name",            dir:"below", optional:1},
+    {k:"itemserial", label:"Serial Number",        dir:"below", optional:1},
+    {k:"screenled",  label:"Screen Health Check",  dir:"right", optional:1},
+    {k:"techsig",    label:"Technician Signature", dir:"right", img:"tech"},
+    {k:"techname",   label:"Name",  withLabel:"Technician Signature", dir:"right", exact:1},
+    {k:"techdate",   label:"Date",  withLabel:"Technician Signature", dir:"right", exact:1},
+    {k:"yes",        label:"Yes",   self:1, circle:"Yes", exact:1},
+    {k:"no",         label:"No",    self:1, circle:"No", exact:1},
+    {k:"custsig",    label:"Customer Signature",   dir:"below", img:"cust"},
+    {k:"custname",   label:"Customer Name",        dir:"below"},
+    {k:"custdate",   label:"Date",  withLabel:"Customer Signature", dir:"below", exact:1}
+  ];
+
+  function compact(s){ return String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"") }
+
+  /* ---- page geometry ------------------------------------------------------
+     The two Engagis templates draw their tables differently: the newer one
+     strokes the grid as lines and only fills the blue label cells; the older
+     one fills nearly every cell. So reduce both to the same thing — a set of
+     vertical and horizontal rules — by taking stroked segments AND the four
+     edges of every filled rectangle. Cells are then whatever those rules
+     bracket, which is true for any template.                                */
+  function pageGrid(page,H,OPS){
+    return page.getOperatorList().then(function(ol){
+      function mul(a,b){return [a[0]*b[0]+a[1]*b[2], a[0]*b[1]+a[1]*b[3],
+        a[2]*b[0]+a[3]*b[2], a[2]*b[1]+a[3]*b[3],
+        a[4]*b[0]+a[5]*b[2]+b[4], a[4]*b[1]+a[5]*b[3]+b[5]]}
+      function ap(m,x,y){ return [m[0]*x+m[2]*y+m[4], m[1]*x+m[3]*y+m[5]] }
+      var ctm=[1,0,0,1,0,0], stack=[], V=[], Z=[], Vneg=[], Zneg=[], covers=[];
+      /* Merged cells are subdivided by WHITE rules — invisible on the page but
+         indistinguishable from real borders unless colour is tracked. Without
+         this, a full-width "Steps taken" cell reads as a narrow first column. */
+      var fillW=false, strokeW=false;
+      function white3(a){ return a[0]>235 && a[1]>235 && a[2]>235 }
+      function seg(p1,p2,neg){
+        var x0=Math.min(p1[0],p2[0]), x1=Math.max(p1[0],p2[0]);
+        var y0=H-Math.max(p1[1],p2[1]), y1=H-Math.min(p1[1],p2[1]);
+        if(x1-x0<1.4 && y1-y0>3) (neg?Vneg:V).push({x:(x0+x1)/2, top:y0, bot:y1});
+        else if(y1-y0<1.4 && x1-x0>3) (neg?Zneg:Z).push({y:(y0+y1)/2, x0:x0, x1:x1});
+      }
+      for(var i=0;i<ol.fnArray.length;i++){
+        var fn=ol.fnArray[i], args=ol.argsArray[i];
+        if(fn===OPS.save){ stack.push({m:ctm.slice(), f:fillW, s:strokeW}); continue }
+        if(fn===OPS.restore){ var st=stack.pop();
+          if(st){ ctm=st.m; fillW=st.f; strokeW=st.s } else ctm=[1,0,0,1,0,0];
+          continue }
+        if(fn===OPS.transform){ ctm=mul(args,ctm); continue }
+        if(fn===OPS.setFillRGBColor){ fillW=white3(args); continue }
+        if(fn===OPS.setStrokeRGBColor){ strokeW=white3(args); continue }
+        if(OPS.setFillGray!==undefined && fn===OPS.setFillGray){ fillW=args[0]>0.92; continue }
+        if(OPS.setStrokeGray!==undefined && fn===OPS.setStrokeGray){ strokeW=args[0]>0.92; continue }
+        if(fn!==OPS.constructPath) continue;
+        var ops=args[0], co=args[1], c=0, cx=0, cy=0;
+        for(var q=0;q<ops.length;q++){
+          var op=ops[q];
+          if(op===OPS.rectangle){
+            var x=co[c], y=co[c+1], w=co[c+2], h=co[c+3]; c+=4;
+            var a1=ap(ctm,x,y), a2=ap(ctm,x+w,y+h);
+            var X0=Math.min(a1[0],a2[0]), X1=Math.max(a1[0],a2[0]);
+            var Y0=Math.min(a1[1],a2[1]), Y1=Math.max(a1[1],a2[1]);
+            /* Only THIN rectangles are rules. The older template paints a
+               background rectangle behind every line of text inside a cell;
+               treating those as borders chops each cell into 10pt slivers. */
+            if(X1-X0>2.5 && Y1-Y0>2.5){
+              /* A white block painted over the grid is how this template makes
+                 merged cells: the column rules are still in the file, they're
+                 just covered up. Record them so those rules can be erased. */
+              if(fillW && X1-X0>4 && Y1-Y0>4 && !(X1-X0>594 && Y1-Y0>700))
+                covers.push({x0:X0, x1:X1, top:H-Y1, bot:H-Y0});
+              continue;
+            }
+            /* A thin WHITE bar is an eraser: it is painted over a real rule to
+               make two cells read as one. Collect it as a negative rule. */
+            seg([X0,Y0],[X0,Y1],fillW); seg([X1,Y0],[X1,Y1],fillW);
+            seg([X0,Y0],[X1,Y0],fillW); seg([X0,Y1],[X1,Y1],fillW);
+          }
+          else if(op===OPS.moveTo){ cx=co[c]; cy=co[c+1]; c+=2 }
+          else if(op===OPS.lineTo){ if(!strokeW) seg(ap(ctm,cx,cy), ap(ctm,co[c],co[c+1]));
+                                    cx=co[c]; cy=co[c+1]; c+=2 }
+          else if(op===OPS.curveTo) c+=6;
+          else if(op===OPS.curveTo2||op===OPS.curveTo3) c+=4;
+        }
+      }
+      V=subtractRules(V,Vneg,true);   Z=subtractRules(Z,Zneg,false);
+      V=eraseCovered(V,covers,true);  Z=eraseCovered(Z,covers,false);
+      return {v:cluster(V,"x","top","bot"), h:cluster(Z,"y","x0","x1")};
+    });
+  }
+  /* cut out the stretches of a rule that a white eraser is drawn over */
+  function subtractRules(rules,negs,vertical){
+    if(!negs.length) return rules;
+    var out=[];
+    rules.forEach(function(r){
+      var pos = vertical ? r.x : r.y;
+      var spans=[[vertical?r.top:r.x0, vertical?r.bot:r.x1]];
+      negs.forEach(function(n){
+        if(Math.abs((vertical?n.x:n.y)-pos)>1.5) return;
+        var a = vertical ? n.top : n.x0, b = vertical ? n.bot : n.x1;
+        var next=[];
+        spans.forEach(function(sp){
+          if(b<=sp[0] || a>=sp[1]){ next.push(sp); return }
+          if(a>sp[0]) next.push([sp[0], a]);
+          if(b<sp[1]) next.push([b, sp[1]]);
+        });
+        spans=next;
+      });
+      spans.forEach(function(sp){
+        if(sp[1]-sp[0]<3) return;
+        if(vertical) out.push({x:r.x, top:sp[0], bot:sp[1]});
+        else out.push({y:r.y, x0:sp[0], x1:sp[1]});
+      });
+    });
+    return out;
+  }
+
+  /* remove the stretches of each rule that a white block sits on top of */
+  function eraseCovered(rules,covers,vertical){
+    if(!covers.length) return rules;
+    var out=[];
+    rules.forEach(function(r){
+      var pos = vertical ? r.x : r.y;
+      var spans=[[vertical?r.top:r.x0, vertical?r.bot:r.x1]];
+      covers.forEach(function(c){
+        var lo = vertical ? c.x0 : c.top, hi = vertical ? c.x1 : c.bot;
+        if(pos<=lo+0.5 || pos>=hi-0.5) return;               // rule is at the block's edge
+        var a = vertical ? c.top : c.x0, b = vertical ? c.bot : c.x1;
+        var next=[];
+        spans.forEach(function(s){
+          if(b<=s[0] || a>=s[1]){ next.push(s); return }
+          if(a>s[0]) next.push([s[0], a]);
+          if(b<s[1]) next.push([b, s[1]]);
+        });
+        spans=next;
+      });
+      spans.forEach(function(s){
+        if(s[1]-s[0]<3) return;
+        if(vertical) out.push({x:r.x, top:s[0], bot:s[1]});
+        else out.push({y:r.y, x0:s[0], x1:s[1]});
+      });
+    });
+    return out;
+  }
+
+  /* merge rules that sit on the same line, unioning their extent */
+  function cluster(arr,key,a,b){
+    /* Group by position FIRST, then merge along the line. Doing both in one
+       pass lets two rules a fraction of a point apart interleave, which
+       silently welds unrelated segments into one long rule. */
+    arr.sort(function(p,q){ return p[key]-q[key] });
+    var groups=[], g=null;
+    arr.forEach(function(s){
+      if(g && s[key]-g.last<=1.2){ g.items.push(s); g.last=s[key] }
+      else { g={items:[s], last:s[key]}; groups.push(g) }
+    });
+    var out=[];
+    groups.forEach(function(gr){
+      var pos=0; gr.items.forEach(function(s){ pos+=s[key] }); pos/=gr.items.length;
+      gr.items.sort(function(p,q){ return p[a]-q[a] });
+      var cur=null;
+      gr.items.forEach(function(s){
+        if(cur && s[a]<=cur[b]+2){ cur[b]=Math.max(cur[b],s[b]) }
+        else { cur={}; cur[key]=pos; cur[a]=s[a]; cur[b]=s[b]; out.push(cur) }
+      });
+    });
+    return out;
+  }
+
+  /* the row that contains point (x,y), bounded by the rules that span x */
+  function bandAt(g,x,y,skip){
+    var above=null, below=null;
+    g.h.forEach(function(h){
+      if(x<h.x0-2 || x>h.x1+2) return;
+      if(h.y<=y-1 && (!above || h.y>above.y)) above=h;
+      if(h.y>=y+1 && (!below || h.y<below.y)) below=h;
+    });
+    if(!above||!below) return null;
+    var band={top:above.y, bot:below.y};
+    if(skip){                                   // step down one row
+      var nxt=null;
+      g.h.forEach(function(h){
+        if(x<h.x0-2 || x>h.x1+2) return;
+        if(h.y>band.bot+1 && (!nxt || h.y<nxt.y)) nxt=h;
+      });
+      if(!nxt) return null;
+      band={top:band.bot, bot:nxt.y};
+    }
+    return band;
+  }
+  /* the column bracket around x, using rules that span the whole band */
+  function colsAt(g,band,x){
+    var xs=[];
+    g.v.forEach(function(v){
+      if(v.top>band.top+2 || v.bot<band.bot-2) return;
+      xs.push(v.x);
+    });
+    xs.sort(function(p,q){return p-q});
+    var uniq=[]; xs.forEach(function(v){ if(!uniq.length||v-uniq[uniq.length-1]>1.5) uniq.push(v) });
+    for(var i=0;i<uniq.length-1;i++){
+      if(x>=uniq[i]-1 && x<uniq[i+1]+1) return {i:i, xs:uniq};
+    }
+    return null;
+  }
+
+  function pageLines(page,H){
+    return page.getTextContent().then(function(tc){
+      var its=[];
+      tc.items.forEach(function(it){
+        var s=it.str; if(!s || !s.trim()) return;
+        its.push({s:s, x:it.transform[4], y:H-it.transform[5]});
+      });
+      its.sort(function(a,b){ return a.y-b.y || a.x-b.x });
+      var lines=[], cur=null;
+      its.forEach(function(it){
+        if(cur && Math.abs(it.y-cur.y)<=2.2){ cur.items.push(it) }
+        else { cur={y:it.y, items:[it]}; lines.push(cur) }
+      });
+      lines.forEach(function(L){
+        L.items.sort(function(a,b){return a.x-b.x});
+        var acc="", marks=[];
+        L.items.forEach(function(it){
+          marks.push({at:acc.length, x:it.x});
+          acc+=compact(it.s);
+        });
+        L.text=acc; L.marks=marks;
+      });
+      return lines;
+    });
+  }
+
+  function buildModel(bytes){
+    var pdfjs=window.pdfjsLib;
+    if(!pdfjs.GlobalWorkerOptions.workerSrc) pdfjs.GlobalWorkerOptions.workerSrc="pdf.worker.min.js";
+    var OPS=pdfjs.OPS;
+    return pdfjs.getDocument({data:bytes, isEvalSupported:false}).promise.then(function(pdf){
+      var pages=[], chain=Promise.resolve();
+      for(var p=1;p<=pdf.numPages;p++){
+        (function(n){
+          chain=chain.then(function(){ return pdf.getPage(n) }).then(function(page){
+            var H=page.getViewport({scale:1}).height;
+            return Promise.all([pageLines(page,H), pageGrid(page,H,OPS)]).then(function(r){
+              pages[n-1]={H:H, lines:r[0], grid:r[1]};
+            });
+          });
+        })(p);
+      }
+      return chain.then(function(){ return pages });
+    });
+  }
+
+  /* ---- locate a label, then the cell holding its value ---- */
+  /* Every place the label appears, best candidates first. The job brief quotes
+     some of these phrases ("...do SCREEN HEALTH CHECK on all solutions"), so a
+     first-match-wins search fills the wrong table. A real form label starts its
+     line; anything else is only tried if the preferred candidates yield no cell. */
+  function findLabels(fd){
+    var want=compact(fd.label), also=fd.withLabel?compact(fd.withLabel):null;
+    var first=[], rest=[];
+    for(var p=0;p<model.length;p++){
+      var pg=model[p];
+      for(var i=0;i<pg.lines.length;i++){
+        var L=pg.lines[i];
+        if(also && L.text.indexOf(also)<0) continue;
+
+        /* Short labels ("Yes", "Name", "Date") are matched against whole text
+           items, never as substrings — otherwise "Yes" matches the "yes" at the
+           start of the joined "yesno" line and lands in the wrong column. */
+        if(fd.exact){
+          for(var q=0;q<L.items.length;q++){
+            if(compact(L.items[q].s)===want) first.push({page:p, x:L.items[q].x, y:L.y});
+          }
+          continue;
+        }
+        var at=L.text.indexOf(want);
+        if(at<0) continue;
+        var x=L.marks[0].x;
+        for(var m=0;m<L.marks.length;m++) if(L.marks[m].at<=at) x=L.marks[m].x;
+        (at===0?first:rest).push({page:p, x:x, y:L.y});
+      }
+    }
+    return first.concat(rest);
+  }
+  function boxFor(loc,fd){
+    var g=model[loc.page].grid;
+    var band=bandAt(g,loc.x+1,loc.y-2,false);
+    if(!band) return null;
+    var col=colsAt(g,band,loc.x+1);
+    if(!col) return null;
+    if(fd.self) return {x0:col.xs[col.i], x1:col.xs[col.i+1], top:band.top, bot:band.bot};
+    if(fd.dir==="right"){
+      /* Some rows have a hairline spacer column between label and value.
+         Step past anything too narrow to hold text. */
+      var k=col.i+1;
+      while(k+1<col.xs.length && col.xs[k+1]-col.xs[k]<20) k++;
+      if(k+1>=col.xs.length) return null;
+      return {x0:col.xs[k], x1:col.xs[k+1], top:band.top, bot:band.bot};
+    }
+    var below=bandAt(g,loc.x+1,loc.y-2,true);
+    if(!below) return null;
+    /* A value sits under its own heading, so keep the heading's column even
+       when the row beneath is one merged cell (Item Name / Serial Number). */
+    var x0=col.xs[col.i], x1=col.xs[col.i+1];
+    var col2=colsAt(g,below,loc.x+1);
+    if(col2){ x0=Math.max(x0,col2.xs[col2.i]); x1=Math.min(x1,col2.xs[col2.i+1]) }
+    if(x1-x0<12){ x0=col.xs[col.i]; x1=col.xs[col.i+1] }
+    return {x0:x0, x1:x1, top:below.top, bot:below.bot};
+  }
+
+  return P.PDFDocument.load(dataUrlToBytes(j.sowPdf)).then(function(d){
+    doc=d;
+    return Promise.all([doc.embedFont(P.StandardFonts.Helvetica),
+                        doc.embedFont(P.StandardFonts.HelveticaBold)]);
+  }).then(function(fo){
+    font=fo[0]; bold=fo[1];
+    var work=Promise.resolve();
+    if(j.sigTech) work=work.then(function(){return doc.embedPng(dataUrlToBytes(j.sigTech))}).then(function(i){sigT=i});
+    if(j.sigCust) work=work.then(function(){return doc.embedPng(dataUrlToBytes(j.sigCust))}).then(function(i){sigC=i});
+    (j.photos||[]).forEach(function(p){
+      work=work.then(function(){return doc.embedJpg(dataUrlToBytes(p.data))}).then(function(i){pics.push(i)});
+    });
+    return work;
+  }).then(function(){
+    return buildModel(dataUrlToBytes(j.sowPdf));
+  }).then(function(m){
+    model=m;
+    var pages=doc.getPages(), items=(j.items||[]).filter(function(i){return i.name||i.serial});
+    var screenled=[f.screen, f.led].filter(function(s){return s&&s.trim()}).join("\n\n");
+    var VALUES={
+      arrive:f.arrive, depart:f.depart, billable:f.billable,
+      rootcause:f.rootcause, steps:f.steps, prevent:f.prevent,
+      itemname:  items.length?items.map(function(i){return i.name||"-"}).join("\n"):"Nil",
+      itemserial:items.length?items.map(function(i){return i.serial||"-"}).join("\n"):"Nil",
+      screenled:screenled, techname:f.techname, techdate:fmtDate(f.techdate),
+      custname:f.custname, custdate:fmtDate(f.custdate)
+    };
+    var NICE={rootcause:"Identified root cause", steps:"Steps taken to resolve",
+      prevent:"Preventative recommendations", screenled:"Screen health check / LED brightness",
+      itemname:"Items to be returned", itemserial:"Serial numbers"};
+
+    var placed=0;
+    FIELDS.forEach(function(fd){
+      var cands=findLabels(fd), loc=null, box=null;
+      for(var ci=0; ci<cands.length; ci++){
+        var b=boxFor(cands[ci],fd);
+        if(b){ loc=cands[ci]; box=b; break }
+      }
+      if(!box){ if(!fd.optional) missed.push(fd.label); return }
+      var pg=pages[loc.page]; if(!pg) return;
+      var H=model[loc.page].H, w=box.x1-box.x0, h=box.bot-box.top;
+      placed++;
+
+      if(fd.circle){
+        if(f.satisfied!==fd.circle) return;
+        pg.drawEllipse({x:(box.x0+box.x1)/2, y:H-(box.top+box.bot)/2,
+          xScale:Math.max(12,Math.min(24,w/2-3)), yScale:Math.max(8,Math.min(12,h/2-2)),
+          borderColor:P.rgb(0,0,0), borderWidth:1.4});
+        return;
+      }
+      if(fd.img){
+        var img=(fd.img==="tech")?sigT:sigC;
+        if(!img) return;
+        pg.drawRectangle({x:box.x0+1, y:H-box.bot+1, width:w-2, height:h-2, color:P.rgb(1,1,1)});
+        var pd=2.5, bw=w-2*pd, bh=h-2*pd, s=Math.min(bw/img.width, bh/img.height);
+        pg.drawImage(img,{x:box.x0+pd+(bw-img.width*s)/2, y:H-box.bot+pd+(bh-img.height*s)/2,
+          width:img.width*s, height:img.height*s});
+        return;
+      }
+
+      var val=VALUES[fd.k]; if(!val||!String(val).trim()) return;
+      if(fd.clear) pg.drawRectangle({x:box.x0+1.2, y:H-box.bot+1.2, width:w-2.4, height:h-2.4, color:P.rgb(1,1,1)});
+
+      /* Row heights vary a lot between templates — the older one has rows only
+         ~10pt tall. Never draw type taller than the row, and shrink to fit
+         before ever spilling onto a continuation sheet. */
+      var pad=2.5, lines, lead, room;
+      var size=Math.max(5.5, Math.min(9.5, h-3));
+      while(true){
+        lines=wrapPdf(val,font,size,w-2*pad);
+        lead=size*1.16;
+        room=Math.max(1, Math.floor((h-2)/lead));
+        if(lines.length<=room || size<=5.5) break;
+        size-=0.25;
+      }
+      var shown=lines, cont=false;
+      if(lines.length>room){ shown=lines.slice(0,Math.max(1,room-1)); cont=true; overflow.push([fd.k,val]) }
+
+      var yy;
+      if(shown.length===1 && !cont){
+        yy=H-(box.top+box.bot)/2 - size*0.36;          // centre a single line
+      } else {
+        yy=H-box.top-pad-size;
+      }
+      shown.forEach(function(ln){
+        pg.drawText(ln,{x:box.x0+pad, y:yy, size:size, font:font, color:P.rgb(0,0,0)}); yy-=lead;
+      });
+      if(cont) pg.drawText("(cont. on attached page)",
+        {x:box.x0+pad, y:yy, size:Math.max(5.5,size*0.8), font:bold, color:P.rgb(0.35,0.4,0.47)});
+    });
+
+    if(placed<6) throw new Error("couldn't read the form fields out of that PDF"+
+      (missed.length?" (missing: "+missed.slice(0,4).join(", ")+")":"")+
+      ". Check you attached the Engagis SOW, and that it isn't a scan.");
+
+    if(overflow.length){
+      var W=612, HH=792, M=44, pg2=doc.addPage([W,HH]), y=HH-M;
+      pg2.drawText("CONTINUATION SHEET",{x:M,y:y-13,size:13,font:bold,color:P.rgb(0.06,0.17,0.30)}); y-=22;
+      pg2.drawText([j.store||"", j.case?"Engagis Case "+j.case:"", j.po||""].filter(Boolean).join("    |    "),
+        {x:M,y:y-10,size:9,font:font,color:P.rgb(0.2,0.26,0.33)}); y-=15;
+      pg2.drawText("Full text of the fields marked “continued” on the Statement of Work.",
+        {x:M,y:y-8,size:7.5,font:font,color:P.rgb(0.45,0.5,0.55)}); y-=14;
+      pg2.drawLine({start:{x:M,y:y},end:{x:W-M,y:y},thickness:1.5,color:P.rgb(0.06,0.17,0.30)}); y-=18;
+      overflow.forEach(function(o){
+        if(y<M+40){ pg2=doc.addPage([W,HH]); y=HH-M }
+        pg2.drawText(NICE[o[0]]||o[0],{x:M,y:y-9,size:9,font:bold,color:P.rgb(0.06,0.17,0.30)}); y-=15;
+        wrapPdf(o[1],font,9,W-2*M).forEach(function(ln){
+          if(y<M+14){ pg2=doc.addPage([W,HH]); y=HH-M }
+          pg2.drawText(ln,{x:M,y:y-9,size:9,font:font,color:P.rgb(0,0,0)}); y-=12.5;
+        });
+        y-=10;
+      });
+    }
+
+    pics.forEach(function(img,i){
+      var W2=612, H2=792, M2=44, p2=doc.addPage([W2,H2]);
+      p2.drawText((j.store||"")+(j.case?"   |   Case "+j.case:"")+"   |   Photo "+(i+1)+" of "+pics.length,
+        {x:M2, y:H2-M2-10, size:10, font:bold, color:P.rgb(0.06,0.17,0.30)});
+      var mw=W2-2*M2, mh=H2-2*M2-46, s=Math.min(mw/img.width, mh/img.height, 1);
+      p2.drawImage(img,{x:M2+(mw-img.width*s)/2, y:M2+(mh-img.height*s)/2,
+        width:img.width*s, height:img.height*s});
+    });
+
+    return doc.save();
+  }).then(function(bytes){
+    var safe=String(j.store||"job").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"");
+    saveBlob(bytes, "SOW_"+(j.case||"")+"_"+safe+"_signed.pdf");
+    return missed;
+  });
+}
+
+/* ---------- actions ---------- */
+$("btnStamp").onclick=function(){
+  if(!validate()) return;
+  var b=this; b.disabled=true; b.textContent="Stamping...";
+  flush().then(stampSow).then(function(missed){
+    b.textContent="Build SOW pack"; b.disabled=false;
+    if(missed && missed.length) alert("SOW filled, but these fields weren't found on this "+
+      "template and are still blank:\n\n\u2022 "+missed.join("\n\u2022 ")+
+      "\n\nFill them in by hand before sending.");
+  }).catch(function(err){
+    alert("Couldn't stamp the SOW: "+(err&&err.message||err)+
+      "\n\nUse “Own PDF” instead — it has all the same information.");
+    b.textContent="Build SOW pack"; b.disabled=false;
+  });
+};
+$("btnPdf").onclick=function(){
+  if(!validate()) return;
+  buildPrint();
+  put(STATE.current).then(function(){ setTimeout(function(){window.print()},120) });
+};
+$("btnSend").onclick=function(){
+  if(!validate()) return;
+  var j=STATE.current, f=j.form;
+  var subj="Completed SOW — "+(j.case?j.case+" | ":"")+(j.store||"")+(j.po?" | "+j.po:"");
+  // kept short on purpose — long mailto bodies get truncated by mail clients
+  var body=
+    "Hi Engagis team,\n\n"+
+    "Please find attached my completed and signed Statement of Work for "+(j.store||"the site")+
+    (j.case?" (Case "+j.case+")":"")+(j.po?", "+j.po:"")+", along with photos of the solution.\n\n"+
+    "Arrival "+(f.arrive||"")+" / departure "+(f.depart||"")+" / billable "+(f.billable||"")+".\n"+
+    "Customer sign-off: "+(f.satisfied||"")+" — "+(f.custname||"")+".\n\n"+
+    ">>> ATTACH the SOW PDF and photos before sending. <<<\n\n"+
+    "Kind regards,\n"+TECH_NAME+"\n"+TECH_BIZ+"\n"+TECH_PH+"\nABN "+TECH_ABN;
+  j.sentAt=new Date().toISOString();
+  put(STATE.current).then(function(){
+    window.location.href="mailto:"+ENGAGIS_TO+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(body);
+    setTimeout(function(){ load().then(backToList) },600);
+  });
+};
+
+/* ---------- menu / import / sync ---------- */
+/* ---------- archive ---------- */
+function renderArchiveBtn(){
+  var j=STATE.current; if(!j) return;
+  var b=$("btnArchive");
+  if(j.archivedAt){
+    b.textContent="Restore from archive";
+    $("archHint").textContent="Archived "+new Date(j.archivedAt).toLocaleDateString()+
+      (j.autoArchived?" automatically":"")+". Nothing has been deleted.";
+  } else {
+    b.textContent="Archive this job";
+    $("archHint").textContent= j.sentAt
+      ? "Moves it out of Completed. It auto-archives after "+ARCHIVE_AFTER_DAYS+" days anyway."
+      : "This job hasn't been sent to Engagis yet — archiving hides it from the list.";
+  }
+}
+$("btnArchive").onclick=function(){
+  var j=STATE.current; if(!j) return;
+  if(j.archivedAt){ j.archivedAt=null; j.autoArchived=false }
+  else {
+    if(!j.sentAt && !confirm("This job hasn't been sent to Engagis yet. Archive it anyway?")) return;
+    j.archivedAt=new Date().toISOString(); j.autoArchived=false;
+  }
+  put(j).then(function(){ renderArchiveBtn(); return load() }).then(function(){
+    if(STATE.current && STATE.current.archivedAt) backToList();
+  });
+};
+$("archHead").onclick=function(){ STATE.showArch=!STATE.showArch; renderList() };
+
+$("btnMenu").onclick=function(){ $("menuModal").classList.add("open") };
+$("btnCloseMenu").onclick=function(){ $("menuModal").classList.remove("open"); $("importPane").style.display="none" };
+$("menuModal").onclick=function(e){ if(e.target===this){this.classList.remove("open")} };
+$("btnBack").onclick=backToList;
+/* ---------- live scan of the Engagis mailbox ----------
+   Talks to /api/sow/jobs on the GalvoOS API. The app has no login of its own,
+   so the endpoint is held behind a key kept only on this device. */
+function scanCfg(){
+  try{
+    return {
+      base:(localStorage.getItem("sowApiBase")||"").replace(/\/+$/,""),
+      key: localStorage.getItem("sowApiKey")||""
+    };
+  }catch(e){ return {base:"",key:""} }
+}
+function askScanCfg(){
+  var c=scanCfg();
+  var base=prompt("GalvoOS API address\n\ne.g. https://api.gitsolutions.au", c.base||"https://");
+  if(base===null) return null;
+  var key=prompt("Scan key (SOW_API_KEY set on the API)", c.key||"");
+  if(key===null) return null;
+  try{
+    localStorage.setItem("sowApiBase", base.trim());
+    localStorage.setItem("sowApiKey", key.trim());
+  }catch(e){}
+  return scanCfg();
+}
+$("btnScan").onclick=function(){
+  var c=scanCfg();
+  if(!c.base||!c.key){ c=askScanCfg(); if(!c) return }
+  if(!navigator.onLine){ alert("No signal — a scan needs a connection. Your jobs are all still here."); return }
+  var b=this, label=b.textContent;
+  b.disabled=true; b.textContent="Scanning Outlook...";
+  var done=function(){ b.disabled=false; b.textContent=label };
+  fetch(c.base+"/api/sow/jobs?days=14",{headers:{"x-sow-key":c.key}})
+    .then(function(r){
+      if(r.status===401) throw new Error("Key rejected. Re-enter it with 'Scan settings'.");
+      return r.json().catch(function(){ throw new Error("Server returned an unreadable reply ("+r.status+")") })
+        .then(function(d){ if(!r.ok) throw new Error(d.error||("Scan failed ("+r.status+")")); return d });
+    })
+    .then(function(d){
+      done();
+      var jobs=d.jobs||[];
+      if(!jobs.length){ alert("Scanned "+(d.scanned||0)+" recent emails — no new Engagis jobs."); return }
+      return mergeJobs(jobs);
+    })
+    .catch(function(e){ done(); alert("Couldn't scan: "+e.message) });
+};
+$("btnScanCfg").onclick=function(){ askScanCfg() };
+$("btnImport").onclick=function(){ $("importPane").style.display="block" };
+$("btnExpandBrief").onclick=function(){
+  var b=$("jhBrief"); b.classList.toggle("expanded");
+  this.textContent=b.classList.contains("expanded")?"Collapse brief":"Show full brief";
+};
+$("btnNewBlank").onclick=function(){
+  var j={id:uid(), store:"New job", issuedTo:TECH_BIZ, jobDate:todayISO(), form:{}, items:[], photos:[]};
+  put(j).then(load).then(function(){ openJob(j.id) });
+};
+$("btnForceUpdate").onclick=function(){
+  // your jobs live in IndexedDB, which none of this touches
+  var jobs=("caches" in window)?caches.keys().then(function(ks){
+    return Promise.all(ks.map(function(k){return caches.delete(k)}));
+  }):Promise.resolve();
+  jobs.then(function(){
+    if(!("serviceWorker" in navigator)) return;
+    return navigator.serviceWorker.getRegistrations().then(function(rs){
+      return Promise.all(rs.map(function(r){return r.unregister()}));
+    });
+  }).then(function(){
+    location.replace(location.pathname+"?v="+Date.now());
+  });
+};
+$("btnBackup").onclick=function(){
+  var data=STATE.jobs.map(function(j){ var c=JSON.parse(JSON.stringify(j)); return c });
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="galvo-sow-backup-"+todayISO()+".json"; a.click();
+};
+
+function mergeJobs(incoming){
+  var byKey={};
+  STATE.jobs.forEach(function(j){ byKey[(j.case||"")+"|"+(j.po||"")+"|"+(j.store||"")]=j });
+  var chain=Promise.resolve(), added=0, updated=0;
+  incoming.forEach(function(n){
+    var key=(n.case||"")+"|"+(n.po||"")+"|"+(n.store||"");
+    var ex=byKey[key];
+    if(ex){
+      // never overwrite work already done onsite
+      ["store","po","case","requestedBy","issuedTo","issueDate","contactName","contactPhone",
+       "contactEmail","siteAddress","issue","device","ltId","token","jobDate","timeAllocated",
+       "jobTime","brief"].forEach(function(k){ if(n[k]) ex[k]=n[k] });
+      updated++; chain=chain.then(function(){return put(ex)});
+    } else {
+      n.id=n.id||uid(); n.form=n.form||{}; n.items=n.items||[]; n.photos=n.photos||[];
+      added++; chain=chain.then(function(){return put(n)});
+    }
+  });
+  return chain.then(load).then(function(){
+    alert(added+" new job"+(added===1?"":"s")+" added, "+updated+" updated.");
+    $("menuModal").classList.remove("open"); $("importPane").style.display="none";
+  });
+}
+$("btnDoImport").onclick=function(){
+  var raw=$("importText").value.trim();
+  if(!raw) return;
+  var data;
+  try{ data=JSON.parse(raw) }catch(err){ alert("That isn't valid JSON: "+err.message); return }
+  if(!Array.isArray(data)) data=[data];
+  mergeJobs(data).then(function(){ $("importText").value="" });
+};
+$("btnSync").onclick=function(){
+  fetch("jobs.json?t="+Date.now()).then(function(r){
+    if(!r.ok) throw new Error("jobs.json not found (HTTP "+r.status+")");
+    return r.json();
+  }).then(function(d){ mergeJobs(Array.isArray(d)?d:[d]) })
+    .catch(function(e){ alert("Couldn't refresh: "+e.message+"\n\nUse 'Import jobs' and paste the JSON instead.") });
+};
+
+/* ---------- boot ---------- */
+function load(){
+  return txAll().then(function(js){ STATE.jobs=js; renderList(); return js });
+}
+document.addEventListener("click",function(e){
+  var b=e.target.closest&&e.target.closest("[data-open]");
+  if(b) openJob(b.getAttribute("data-open"));
+});
+function flagOffline(){ document.body.classList.toggle("is-offline",!navigator.onLine) }
+window.addEventListener("online",flagOffline); window.addEventListener("offline",flagOffline); flagOffline();
+
+load().then(autoArchive).then(function(){
+  var js=STATE.jobs;
+  if(!js.length){
+    // first run: try jobs.json silently
+    fetch("jobs.json").then(function(r){return r.ok?r.json():null}).then(function(d){
+      if(d) { (Array.isArray(d)?d:[d]).forEach(function(n){ n.id=n.id||uid(); n.form={};n.items=[];n.photos=[]; put(n) });
+        setTimeout(load,300); }
+    }).catch(function(){});
+  }
+});
+if("serviceWorker" in navigator && location.protocol!=="file:"){
+  navigator.serviceWorker.register("sw.js").catch(function(){});
+}
+window.addEventListener("beforeunload",function(){ if(STATE.current){ collect(); put(STATE.current) } });
+document.addEventListener("visibilitychange",function(){ if(document.hidden) flush(); });
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "Galvo's SOW — Onsite Job Sheet",
+  "short_name": "Galvo's SOW",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f2c4c",
+  "theme_color": "#0f2c4c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='96' fill='%230f2c4c'/%3E%3Ctext x='256' y='320' font-family='Helvetica,Arial,sans-serif' font-size='210' font-weight='700' fill='%23ffffff' text-anchor='middle'%3ESOW%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
