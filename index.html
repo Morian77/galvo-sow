@@ -370,7 +370,7 @@ table.items td:last-child{padding-right:0}
   <div class="inner">
     <h3>Menu</h3>
     <p class="hint" style="margin-top:0">Galvo's IT Solutions &middot; steven.galvin@gitsolutions.au &middot; ABN 97 523 921 917<br>
-      <b>Build 2026-08-01b</b> &mdash; scan attaches the SOW automatically</p>
+      <b>Build 2026-08-01c</b> &mdash; scan attaches the SOW automatically</p>
     <button class="btn primary" style="width:100%;margin-bottom:8px" id="btnScan">Scan Outlook for new jobs</button>
     <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnImport">Import jobs (paste JSON)</button>
     <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnSync">Refresh jobs from jobs.json</button>
@@ -1591,12 +1591,45 @@ function mergeJobs(incoming){
     $("menuModal").classList.remove("open"); $("importPane").style.display="none";
   });
 }
+/* Text pasted out of an email arrives with non-breaking spaces, curly quotes
+   and sometimes a markdown fence around it — none of which JSON.parse accepts.
+   Clean it up rather than making Steven hunt for an invisible character. */
+function parseLoose(raw){
+  var attempts=[];
+  var t=String(raw).trim();
+  attempts.push(t);
+
+  // strip a ``` or ```json fence
+  t=t.replace(/^```[a-zA-Z]*\s*/, "").replace(/```$/, "").trim();
+  // keep only the outermost [...] or {...} if there's chatter around it
+  var a=t.indexOf("["), b=t.lastIndexOf("]");
+  if(a>0 || (a>=0 && b>=0 && b<t.length-1)) t=t.slice(a, b+1);
+  // invisible spaces: NBSP, narrow NBSP, figure space, BOM, zero-width
+  t=t.replace(/[\u00A0\u2007\u202F\uFEFF\u200B-\u200D]/g, " ");
+  attempts.push(t);
+
+  // last resort: word-processor quotes around the JSON structure
+  attempts.push(t.replace(/[\u201C\u201D]/g, '"').replace(/[\u2018\u2019]/g, "'"));
+
+  var lastErr=null;
+  for(var i=0;i<attempts.length;i++){
+    try{ return {data:JSON.parse(attempts[i])} }catch(e){ lastErr=e }
+  }
+  return {error:lastErr};
+}
+
 $("btnDoImport").onclick=function(){
   var raw=$("importText").value.trim();
   if(!raw) return;
-  var data;
-  try{ data=JSON.parse(raw) }catch(err){ alert("That isn't valid JSON: "+err.message); return }
+  var out=parseLoose(raw);
+  if(out.error){
+    alert("That doesn't look like job JSON.\n\n"+out.error.message+
+      "\n\nPaste everything from the opening [ to the closing ] — nothing before or after.");
+    return;
+  }
+  var data=out.data;
   if(!Array.isArray(data)) data=[data];
+  if(!data.length){ alert("No jobs in that block."); return }
   mergeJobs(data).then(function(){ $("importText").value="" });
 };
 $("btnSync").onclick=function(){
