@@ -370,7 +370,7 @@ table.items td:last-child{padding-right:0}
   <div class="inner">
     <h3>Menu</h3>
     <p class="hint" style="margin-top:0">Galvo's IT Solutions &middot; steven.galvin@gitsolutions.au &middot; ABN 97 523 921 917<br>
-      <b>Build 2026-07-30b</b> &mdash; fills the SOW in place &middot; archive &middot; live scan</p>
+      <b>Build 2026-08-01a</b> &mdash; scan attaches the SOW automatically</p>
     <button class="btn primary" style="width:100%;margin-bottom:8px" id="btnScan">Scan Outlook for new jobs</button>
     <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnImport">Import jobs (paste JSON)</button>
     <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnSync">Refresh jobs from jobs.json</button>
@@ -894,8 +894,9 @@ function renderSowStatus(){
       "</b><br>&ldquo;Build SOW pack&rdquo; will return this file with your signed summary added. "+
       "<button type='button' class='clearsig' id='btnDropSow'>Remove</button>";
   } else {
-    $("sowStatus").innerHTML="Nothing attached &mdash; &ldquo;Build SOW pack&rdquo; is off. "+
-      "Use &ldquo;Own PDF&rdquo; to produce a standalone job sheet instead.";
+    $("sowStatus").innerHTML="<b>Nothing attached &mdash; &ldquo;Build SOW pack&rdquo; is off.</b><br>"+
+      "A scan normally attaches it for you. Attach it by hand above, or use "+
+      "&ldquo;Own PDF&rdquo; for a standalone job sheet.";
   }
   $("btnStamp").disabled=!j.sowPdf;
 }
@@ -1540,12 +1541,20 @@ function mergeJobs(incoming){
   var chain=Promise.resolve(), added=0, updated=0;
   incoming.forEach(function(n){
     var key=(n.case||"")+"|"+(n.po||"")+"|"+(n.store||"");
+    // the scan now returns the Engagis SOW itself, so it's attached before you arrive
+    if(n.sowPdfBase64 && !n.sowPdf){
+      n.sowPdf="data:application/pdf;base64,"+n.sowPdfBase64;
+      n.sowPdfName=n.sowPdfName||"Engagis_SOW.pdf";
+    }
+    delete n.sowPdfBase64;
+
     var ex=byKey[key];
     if(ex){
       // never overwrite work already done onsite
       ["store","po","case","requestedBy","issuedTo","issueDate","contactName","contactPhone",
        "contactEmail","siteAddress","issue","device","ltId","token","jobDate","timeAllocated",
        "jobTime","brief"].forEach(function(k){ if(n[k]) ex[k]=n[k] });
+      if(n.sowPdf && !ex.sowPdf){ ex.sowPdf=n.sowPdf; ex.sowPdfName=n.sowPdfName }
       updated++; chain=chain.then(function(){return put(ex)});
     } else {
       n.id=n.id||uid(); n.form=n.form||{}; n.items=n.items||[]; n.photos=n.photos||[];
