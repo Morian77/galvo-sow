@@ -370,7 +370,7 @@ table.items td:last-child{padding-right:0}
   <div class="inner">
     <h3>Menu</h3>
     <p class="hint" style="margin-top:0">Galvo's IT Solutions &middot; steven.galvin@gitsolutions.au &middot; ABN 97 523 921 917<br>
-      <b>Build 2026-08-01a</b> &mdash; scan attaches the SOW automatically</p>
+      <b>Build 2026-08-01b</b> &mdash; scan attaches the SOW automatically</p>
     <button class="btn primary" style="width:100%;margin-bottom:8px" id="btnScan">Scan Outlook for new jobs</button>
     <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnImport">Import jobs (paste JSON)</button>
     <button class="btn ghost" style="width:100%;margin-bottom:8px" id="btnSync">Refresh jobs from jobs.json</button>
@@ -1230,30 +1230,54 @@ function stampSow(){
     }
     return first.concat(rest);
   }
+  /* The first row of the next page, in the column the label sits in. Engagis
+     split their tables across pages, so a heading at the foot of one page has
+     its value row at the top of the next. */
+  function bandOnNextPage(pageIdx,x){
+    var next=model[pageIdx+1];
+    if(!next) return null;
+    var ys=[];
+    next.grid.h.forEach(function(h){ if(x>=h.x0-2 && x<=h.x1+2) ys.push(h.y) });
+    ys.sort(function(a,b){return a-b});
+    var uniq=[]; ys.forEach(function(y){ if(!uniq.length || y-uniq[uniq.length-1]>2) uniq.push(y) });
+    if(uniq.length<2) return null;
+    return {page:pageIdx+1, top:uniq[0], bot:uniq[1]};
+  }
+
   function boxFor(loc,fd){
     var g=model[loc.page].grid;
     var band=bandAt(g,loc.x+1,loc.y-2,false);
     if(!band) return null;
     var col=colsAt(g,band,loc.x+1);
     if(!col) return null;
-    if(fd.self) return {x0:col.xs[col.i], x1:col.xs[col.i+1], top:band.top, bot:band.bot};
+    if(fd.self) return {page:loc.page, x0:col.xs[col.i], x1:col.xs[col.i+1], top:band.top, bot:band.bot};
     if(fd.dir==="right"){
       /* Some rows have a hairline spacer column between label and value.
          Step past anything too narrow to hold text. */
       var k=col.i+1;
       while(k+1<col.xs.length && col.xs[k+1]-col.xs[k]<20) k++;
       if(k+1>=col.xs.length) return null;
-      return {x0:col.xs[k], x1:col.xs[k+1], top:band.top, bot:band.bot};
+      return {page:loc.page, x0:col.xs[k], x1:col.xs[k+1], top:band.top, bot:band.bot};
     }
+
     var below=bandAt(g,loc.x+1,loc.y-2,true);
-    if(!below) return null;
+    if(!below){
+      var nx=bandOnNextPage(loc.page,loc.x+1);
+      if(!nx) return null;
+      var g2=model[nx.page].grid;
+      var c2=colsAt(g2,{top:nx.top,bot:nx.bot},loc.x+1);
+      var nx0=col.xs[col.i], nx1=col.xs[col.i+1];
+      if(c2){ nx0=Math.max(nx0,c2.xs[c2.i]); nx1=Math.min(nx1,c2.xs[c2.i+1]) }
+      if(nx1-nx0<12){ nx0=col.xs[col.i]; nx1=col.xs[col.i+1] }
+      return {page:nx.page, x0:nx0, x1:nx1, top:nx.top, bot:nx.bot};
+    }
     /* A value sits under its own heading, so keep the heading's column even
        when the row beneath is one merged cell (Item Name / Serial Number). */
     var x0=col.xs[col.i], x1=col.xs[col.i+1];
     var col2=colsAt(g,below,loc.x+1);
     if(col2){ x0=Math.max(x0,col2.xs[col2.i]); x1=Math.min(x1,col2.xs[col2.i+1]) }
     if(x1-x0<12){ x0=col.xs[col.i]; x1=col.xs[col.i+1] }
-    return {x0:x0, x1:x1, top:below.top, bot:below.bot};
+    return {page:loc.page, x0:x0, x1:x1, top:below.top, bot:below.bot};
   }
 
   return P.PDFDocument.load(dataUrlToBytes(j.sowPdf)).then(function(d){
@@ -1295,8 +1319,9 @@ function stampSow(){
         if(b){ loc=cands[ci]; box=b; break }
       }
       if(!box){ if(!fd.optional) missed.push(fd.label); return }
-      var pg=pages[loc.page]; if(!pg) return;
-      var H=model[loc.page].H, w=box.x1-box.x0, h=box.bot-box.top;
+      var pIdx=(box.page===undefined)?loc.page:box.page;
+      var pg=pages[pIdx]; if(!pg) return;
+      var H=model[pIdx].H, w=box.x1-box.x0, h=box.bot-box.top;
       placed++;
 
       if(fd.circle){
