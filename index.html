@@ -299,8 +299,14 @@ table.items td:last-child{padding-right:0}
     <h3>Photos</h3>
     <div class="body">
       <div class="hint" style="margin:0 0 8px">Engagis requires photos of the solutions/devices with the signed SOW. Photos are resized on-device and stored offline.</div>
+      <!-- Two inputs on purpose: `capture` opens the camera but forbids picking
+           existing shots and overrides `multiple`, so each route needs its own. -->
+      <input type="file" id="cameraInput" accept="image/*" capture="environment" style="display:none">
       <input type="file" id="photoInput" accept="image/*" multiple style="display:none">
-      <button type="button" class="addrow" id="btnAddPhoto" style="width:100%;padding:13px">Take / attach photos</button>
+      <div style="display:flex;gap:8px">
+        <button type="button" class="addrow" id="btnTakePhoto" style="flex:1;padding:13px">Take photo</button>
+        <button type="button" class="addrow" id="btnAddPhoto" style="flex:1;padding:13px">Add from gallery</button>
+      </div>
       <div class="photogrid" id="photoGrid"></div>
     </div>
   </div>
@@ -659,28 +665,47 @@ function renderItems(){
 $("btnAddItem").onclick=function(){ $("itemsBody").appendChild(itemRow()) };
 
 /* ---------- photos ---------- */
+$("btnTakePhoto").onclick=function(){ $("cameraInput").click() };
 $("btnAddPhoto").onclick=function(){ $("photoInput").click() };
-$("photoInput").onchange=function(e){
-  var files=Array.prototype.slice.call(e.target.files||[]);
-  var done=0;
+
+function ingestPhotos(e){
+  var input=e.target;
+  var files=Array.prototype.slice.call(input.files||[]);
+  if(!files.length) return;
+  var done=0, failed=0;
+  /* Count every outcome, not just successes: one undecodable file (a HEIC the
+     browser won't read, say) used to leave the counter short and silently drop
+     the whole batch. */
+  function settle(){
+    if(done+failed<files.length) return;
+    renderPhotos(); put(STATE.current);
+    if(failed) alert(failed+" photo"+(failed===1?"":"s")+" couldn't be read and "+
+      (failed===1?"was":"were")+" skipped. Try taking "+(failed===1?"it":"them")+" again.");
+  }
   files.forEach(function(file){
     var fr=new FileReader();
+    fr.onerror=function(){ failed++; settle() };
     fr.onload=function(){
       var img=new Image();
+      img.onerror=function(){ failed++; settle() };
       img.onload=function(){
         var max=1500, s=Math.min(1,max/Math.max(img.width,img.height));
         var c=document.createElement("canvas");
         c.width=Math.round(img.width*s); c.height=Math.round(img.height*s);
         c.getContext("2d").drawImage(img,0,0,c.width,c.height);
         STATE.current.photos.push({id:uid(), data:c.toDataURL("image/jpeg",0.72), caption:""});
-        if(++done===files.length){ renderPhotos(); put(STATE.current) }
+        done++; settle();
       };
       img.src=fr.result;
     };
     fr.readAsDataURL(file);
   });
-  e.target.value="";
-};
+  /* Phones reuse filenames (IMG_0001.jpg every shot on some Androids); without
+     clearing, the second identical name fires no change event. */
+  input.value="";
+}
+$("cameraInput").onchange=ingestPhotos;
+$("photoInput").onchange=ingestPhotos;
 function renderPhotos(){
   var g=$("photoGrid"), ps=STATE.current.photos||[];
   g.innerHTML=ps.map(function(p,i){
