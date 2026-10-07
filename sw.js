@@ -1,6 +1,6 @@
 /* Galvo's SOW — offline cache
    Bump CACHE whenever index.html changes, so phones pick up the new build. */
-var CACHE = "galvo-sow-v12-20261007b";
+var CACHE = "galvo-sow-v13-20261007c";
 var ASSETS = ["./", "./index.html", "./manifest.json", "./pdf-lib.min.js", "./pdf.min.js", "./pdf.worker.min.js"];
 
 self.addEventListener("install", function (e) {
