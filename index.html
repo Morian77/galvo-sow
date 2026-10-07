@@ -1407,16 +1407,52 @@ function stampSow(){
     return doc.save();
   }).then(function(bytes){
     var safe=String(j.store||"job").replace(/[^A-Za-z0-9]+/g,"-").replace(/^-|-$/g,"");
-    saveBlob(bytes, "SOW_"+(j.case||"")+"_"+safe+"_signed.pdf");
-    return missed;
+    /* Hand the pack back rather than downloading it here: "Build SOW pack"
+       saves it, "Email" attaches it to the share sheet. */
+    return { bytes:bytes, name:"SOW_"+(j.case||"")+"_"+safe+"_signed.pdf", missed:missed };
   });
+}
+
+/* Can this browser put a file into the share sheet? Needs a top-level page in a
+   secure context (https); on file:// the API is absent or refuses files. */
+function canSharePdf(){
+  try{
+    if(window.self!==window.top) return false;
+    if(!window.isSecureContext) return false;
+    if(!navigator.share || !navigator.canShare) return false;
+    var probe=new File([new Blob(["x"],{type:"application/pdf"})],"probe.pdf",{type:"application/pdf"});
+    return navigator.canShare({files:[probe]});
+  }catch(e){ return false; }
+}
+
+/* A mailto: URL cannot carry an attachment — the scheme has no field for one.
+   The share sheet is the only route that hands the mail app a real file. */
+function shareOrMail(pack, subj, body){
+  if(canSharePdf()){
+    var file=new File([pack.bytes],pack.name,{type:"application/pdf"});
+    return navigator.share({files:[file], title:pack.name, text:body})
+      .then(function(){ return "shared" })
+      .catch(function(e){
+        if(e && e.name==="AbortError") return "cancelled";
+        saveBlob(pack.bytes, pack.name);
+        window.location.href="mailto:"+ENGAGIS_TO+"?subject="+encodeURIComponent(subj)+
+          "&body="+encodeURIComponent(body);
+        return "fallback";
+      });
+  }
+  saveBlob(pack.bytes, pack.name);
+  window.location.href="mailto:"+ENGAGIS_TO+"?subject="+encodeURIComponent(subj)+
+    "&body="+encodeURIComponent(body);
+  return Promise.resolve("fallback");
 }
 
 /* ---------- actions ---------- */
 $("btnStamp").onclick=function(){
   if(!validate()) return;
   var b=this; b.disabled=true; b.textContent="Stamping...";
-  flush().then(stampSow).then(function(missed){
+  flush().then(stampSow).then(function(pack){
+    saveBlob(pack.bytes, pack.name);
+    var missed=pack.missed;
     b.textContent="Build SOW pack"; b.disabled=false;
     if(missed && missed.length) alert("SOW filled, but these fields weren't found on this "+
       "template and are still blank:\n\n\u2022 "+missed.join("\n\u2022 ")+
@@ -1434,7 +1470,7 @@ $("btnPdf").onclick=function(){
 };
 $("btnSend").onclick=function(){
   if(!validate()) return;
-  var j=STATE.current, f=j.form;
+  var j=STATE.current, f=j.form, b=this, attaches=canSharePdf();
   var subj="Completed SOW — "+(j.case?j.case+" | ":"")+(j.store||"")+(j.po?" | "+j.po:"");
   // kept short on purpose — long mailto bodies get truncated by mail clients
   var body=
@@ -1443,12 +1479,28 @@ $("btnSend").onclick=function(){
     (j.case?" (Case "+j.case+")":"")+(j.po?", "+j.po:"")+", along with photos of the solution.\n\n"+
     "Arrival "+(f.arrive||"")+" / departure "+(f.depart||"")+" / billable "+(f.billable||"")+".\n"+
     "Customer sign-off: "+(f.satisfied||"")+" — "+(f.custname||"")+".\n\n"+
-    ">>> ATTACH the SOW PDF and photos before sending. <<<\n\n"+
+    (attaches ? "" : ">>> ATTACH the SOW PDF and photos before sending. <<<\n\n")+
     "Kind regards,\n"+TECH_NAME+"\n"+TECH_BIZ+"\n"+TECH_PH+"\nABN "+TECH_ABN;
-  j.sentAt=new Date().toISOString();
-  put(STATE.current).then(function(){
-    window.location.href="mailto:"+ENGAGIS_TO+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(body);
-    setTimeout(function(){ load().then(backToList) },600);
+
+  b.disabled=true; b.textContent=attaches?"Building...":"Preparing...";
+  flush().then(stampSow).then(function(pack){
+    if(pack.missed && pack.missed.length) alert("SOW filled, but these fields weren't found on this "+
+      "template and are still blank:\n\n• "+pack.missed.join("\n• ")+
+      "\n\nFill them in by hand before sending.");
+    return shareOrMail(pack, subj, body);
+  }).then(function(result){
+    b.textContent="Email"; b.disabled=false;
+    if(result==="cancelled") return;           // user backed out; nothing sent, nothing stamped
+    j.sentAt=new Date().toISOString();
+    put(STATE.current).then(function(){
+      setTimeout(function(){ load().then(backToList) },600);
+    });
+  }).catch(function(err){
+    b.textContent="Email"; b.disabled=false;
+    alert("Couldn't build the SOW pack: "+(err&&err.message||err)+
+      "\n\nUse “Build SOW pack”, then attach the file to the email yourself.");
+    window.location.href="mailto:"+ENGAGIS_TO+"?subject="+encodeURIComponent(subj)+
+      "&body="+encodeURIComponent(body);
   });
 };
 
